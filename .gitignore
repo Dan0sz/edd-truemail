@@ -1,0 +1,10 @@
+.DS_Store
+.idea
+.git
+.svn
+.svnignore
+
+vendor/*
+!vendor/composer/
+!vendor/autoload.php
+config.php

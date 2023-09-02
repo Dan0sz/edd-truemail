@@ -1,0 +1,37 @@
+name: Build Plugin Release
+
+on:
+  release:
+    types: [released]
+
+jobs:
+  build:
+    name: Build Plugin Artifact
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install composer dependencies
+        uses: php-actions/composer@v2
+        with:
+          dev: no
+
+      - uses: actions/setup-node@v1
+        with:
+          node-version: "16"
+
+      - name: Generate plugin artifact
+        run: |
+          rsync -rc --exclude-from="$GITHUB_WORKSPACE/.distignore" "$GITHUB_WORKSPACE/" release/ --delete --delete-excluded
+          cd "${GITHUB_WORKSPACE}/release" || exit
+          zip -r "${GITHUB_WORKSPACE}/edd-truemail.zip" .
+      - name: Upload release asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ${{github.workspace}}/edd-truemail.zip
+          asset_name: edd-truemail.zip
+          asset_content_type: application/zip
