@@ -28,6 +28,7 @@
 	<rule ref="WordPress-Extra">
         <exclude name="WordPress.PHP.YodaConditions"/>
 		<exclude name="Generic.Arrays.DisallowShortArraySyntax" />
+		<exclude name="Generic.WhiteSpace.DisallowSpaceIndent" />
 		<exclude name="WordPress.Files.FileName.InvalidClassFileName" />
 		<exclude name="WordPress.Files.FileName.NotHyphenatedLowercase" />
 		<exclude name="WordPress.WP.I18n.MissingTranslatorsComment" />
