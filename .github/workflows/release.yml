@@ -10,17 +10,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
-
-      - name: Install composer dependencies
-        uses: php-actions/composer@v2
-        with:
-          dev: no
-
-      - uses: actions/setup-node@v1
-        with:
-          node-version: "16"
-
       - name: Generate plugin artifact
         run: |
           rsync -rc --exclude-from="$GITHUB_WORKSPACE/.distignore" "$GITHUB_WORKSPACE/" release/ --delete --delete-excluded
