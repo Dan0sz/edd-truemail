@@ -52,6 +52,10 @@ class Ajax {
             $response['message'] = __( 'We couldn\'t verify your email address. Are you sure it\'s spelled correctly?', 'edd-truemail' );
         }
 
+        if ( ! $result['success'] && $result['code'] === 400 ) {
+            $response['message'] = __( 'Please enter a valid email address.', 'edd-truemail' );
+        }
+
         if ( ! $result['success'] && $result['code'] === 408 ) {
             $response['message'] = __( 'Request timed out.', 'edd-truemail' );
         }
