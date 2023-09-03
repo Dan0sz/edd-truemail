@@ -39,12 +39,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Fail silently on a timeout.
                 emailField.classList.remove('edd-truemail-success');
                 emailField.classList.remove('edd-truemail-warning');
-
-                message.innerHTML = '';
             }
 
             if (add_message === true) {
                 message.innerHTML = '<sup><em>' + response.data.message + '</em></sup>';
+            } else {
+                message.innerHTML = '';
             }
 
             remove_loader();

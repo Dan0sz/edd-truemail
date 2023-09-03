@@ -44,9 +44,10 @@ class Client {
         $email = sanitize_email( $email );
 
         if ( ! $email ) {
+            // Bad Request
             return [
 				'success' => false,
-				'code'    => 200,
+				'code'    => 400,
             ];
         }
 
@@ -64,6 +65,7 @@ class Client {
         );
 
         if ( is_wp_error( $response ) ) {
+            // Timeout
             return [
 				'success' => false,
 				'code'    => 408,
@@ -72,6 +74,7 @@ class Client {
 
         $body = json_decode( wp_remote_retrieve_body( $response ) );
 
+        // Success
         return [
 			'success' => $body->success,
 			'code'    => 200,
