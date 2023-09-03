@@ -21,12 +21,7 @@ class Ajax {
     }
 
     public function verify() {
-        $email = isset( $_POST['email'] ) ? sanitize_email( $_POST['email'] ) : false;
-
-        if ( ! $email ) {
-            wp_send_json_error( [ 'message' => __( 'No email address entered.', 'edd-truemail' ) ] );
-        }
-
+        $email  = isset( $_POST['email'] ) ? sanitize_email( $_POST['email'] ) : false;
         $client = new Client();
         $result = $client->verify( $email );
 
