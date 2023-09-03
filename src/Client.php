@@ -49,6 +49,7 @@ class Client {
         $response = wp_remote_get(
             $url,
             [
+                'timeout' => 10,
                 'headers' => [
                     'Content-Type'  => 'application/json',
                     'Accept'        => 'application/json',

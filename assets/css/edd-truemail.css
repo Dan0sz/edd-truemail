@@ -10,5 +10,10 @@
 
 .edd-truemail-success {
     background: url(../images/green-check.png) no-repeat 98% !important;
-    background-size: 25px !important;
+    background-size: 2
+    5px !important;
+}
+
+.edd-truemail-message {
+  padding: 5px 20px 0;
 }

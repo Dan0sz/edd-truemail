@@ -1,5 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
     var emailField = document.getElementById('edd-email');
+    var message = document.createElement('div');
+
+    message.classList.add('edd-truemail-message');
+    emailField.insertAdjacentElement('afterend', message);
 
     emailField.addEventListener('blur', (e) => {
         set_loader();
@@ -22,9 +26,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (data.success) {
                 emailField.classList.remove('edd-truemail-error');
                 emailField.classList.add('edd-truemail-success');
+
+                message.innerHTML = '<sup>The email address you entered is <span style="color: green;">valid</span></sup>';
             } else {
                 emailField.classList.remove('edd-truemail-success');
                 emailField.classList.add('edd-truemail-error');
+
+                message.innerHTML = '<sup>The email address you entered is <span style="color: red;">invalid</span></sup>';
             }
 
             remove_loader();
