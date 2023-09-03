@@ -41,6 +41,8 @@ class Client {
      * @return void
      */
     public function verify( $email ) {
+        $email = sanitize_email( $email );
+
         if ( ! $email ) {
             return false;
         }
@@ -49,7 +51,7 @@ class Client {
         $response = wp_remote_get(
             $url,
             [
-                'timeout' => 10,
+                'timeout' => 30,
                 'headers' => [
                     'Content-Type'  => 'application/json',
                     'Accept'        => 'application/json',
