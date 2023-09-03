@@ -15,10 +15,13 @@ Releases are listed [here](https://github.com/Dan0sz/edd-truemail/releases). Dow
 
 ## Configuration
 
-Configuration is simple.
+This plugin's options are available under Downloads > Settings > Extensions > TrueMail:
 
-1. Enter your Access Token,
-2. And the public URL of your TrueMail instance.
+1. Enter your Access Token, and
+2. The public URL of your TrueMail instance, and
+3. Hit Save.
+
+That's it!
 
 ## How it works
 
