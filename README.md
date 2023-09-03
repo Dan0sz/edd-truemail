@@ -9,6 +9,10 @@ This plugin for WordPress adds Truemail integration to Easy Digital Downloads' c
 * Easy Digital Downloads 3.x
 * A working/reachable instance of [TrueMail](https://truemail-rb.org/#/about)
 
+## Installation
+
+Releases are listed [here](https://github.com/Dan0sz/edd-truemail/releases). Download the `edd-truemail.zip` file listed with every release in the **Assets** section to download a properly "WordPress-style" packed .zip-file.
+
 ## Configuration
 
 Configuration is simple.
