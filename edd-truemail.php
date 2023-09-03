@@ -3,7 +3,7 @@
  * Plugin Name: Truemail for Easy Digital Downloads
  * Plugin URI: https://daan.dev/wordpress/easy-moneybird-edd/
  * Description: This plugin adds Truemail email address validation to Easy Digital Downloads' checkout.
- * Version: 1.0.0
+ * Version: 1.1.0
  * Author: Daan from Daan.dev
  * Author URI: https://daan.dev/about/
  * Text Domain: edd-truemail
