@@ -9,17 +9,36 @@
  */
 namespace EDD\Truemail;
 
+use WpOrg\Requests\Exception\InvalidArgument;
+
 defined( 'ABSPATH' ) || exit;
 
 class Ajax {
+    /**
+     * Ajax constructor.
+     *
+     * @return void
+     */
     public function __construct() {
 	    $this->init();
     }
 
+    /**
+     * Initializes the class.
+     *
+     * @return void
+     */
     private function init() {
         add_action( 'wp_ajax_edd_truemail_verify_email', [ $this, 'verify' ] );
     }
 
+    /**
+     * Verifies an email address.
+     *
+     * @return void
+     *
+     * @throws InvalidArgument
+     */
     public function verify() {
         $email  = isset( $_POST['email'] ) ? sanitize_email( $_POST['email'] ) : false;
         $client = new Client();
