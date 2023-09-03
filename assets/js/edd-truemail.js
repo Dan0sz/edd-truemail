@@ -5,7 +5,16 @@ document.addEventListener('DOMContentLoaded', () => {
     message.classList.add('edd-truemail-message');
     emailField.insertAdjacentElement('afterend', message);
 
-    emailField.addEventListener('blur', (e) => {
+    emailField.addEventListener('change', () => {
+        emailField.classList.remove('edd-truemail-success');
+        emailField.classList.remove('edd-truemail-warning');
+    });
+
+    emailField.addEventListener('blur', () => {
+        if (emailField.classList.contains('edd-truemail-success')) {
+            return;
+        }
+
         var add_message = false;
 
         set_loader();
