@@ -26,8 +26,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (data.success) {
                 emailField.classList.remove('edd-truemail-error');
                 emailField.classList.add('edd-truemail-success');
-
-                message.innerHTML = '<sup>The email address you entered is <span style="color: green;">valid</span></sup>';
             } else {
                 emailField.classList.remove('edd-truemail-success');
                 emailField.classList.add('edd-truemail-error');
