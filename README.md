@@ -1,5 +1,7 @@
 # Truemail for Easy Digital Downloads
 
+This plugin for WordPress adds Truemail integration to Easy Digital Downloads' checkout.
+
 ## Requirements
 
 * PHP 7.2 or higher
@@ -9,4 +11,16 @@
 
 ## Configuration
 
+Configuration is simple.
+
+1. Enter your Access Token,
+2. And the public URL of your TrueMail instance.
+
 ## How it works
+
+This plugin adds two things to Easy Digital Downloads' checkout:
+
+1. Instant verification/validation of the entered email address, with feedback:
+   - It shows a green check in the email address field, if validation was successful.
+   - It shows a red cross, along with an error message, if validation failed -- also in case of a timeout.
+2. If a user tries to submit the form, even though validation failed, an EDD error message will be shown, saying: "The email address you entered is incorrect."
