@@ -17,7 +17,6 @@ defined( 'ABSPATH' ) || exit;
 define( 'EDD_TM_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'EDD_TM_PLUGIN_FILE', __FILE__ );
 define( 'EDD_TM_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
-define( 'EDD_TM_PLUGIN_VERSION', '1.1.1' );
 
 /**
  * Takes care of loading classes on demand.
