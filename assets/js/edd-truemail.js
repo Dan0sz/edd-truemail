@@ -6,6 +6,8 @@ document.addEventListener('DOMContentLoaded', () => {
     emailField.insertAdjacentElement('afterend', message);
 
     emailField.addEventListener('blur', (e) => {
+        var add_message = false;
+
         set_loader();
 
         const form = new FormData();
@@ -22,17 +24,27 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         ).then(
             response => response.json()
-        ).then(data => {
-            if (data.success) {
-                emailField.classList.remove('edd-truemail-error');
+        ).then(response => {
+            if (response.data.status === 200 && response.data.success === true) {
+                // Valid email address.
+                emailField.classList.remove('edd-truemail-warning');
                 emailField.classList.add('edd-truemail-success');
+            } else if (response.data.status === 200 && response.data.success === false) {
+                // Email address is invalid.
+                emailField.classList.remove('edd-truemail-success');
+                emailField.classList.add('edd-truemail-warning');
+
+                add_message = true;
+            } else {
+                // Fail silently on a timeout.
+                emailField.classList.remove('edd-truemail-success');
+                emailField.classList.remove('edd-truemail-warning');
 
                 message.innerHTML = '';
-            } else {
-                emailField.classList.remove('edd-truemail-success');
-                emailField.classList.add('edd-truemail-error');
+            }
 
-                message.innerHTML = '<sup>The email address you entered is <span style="color: red;">invalid</span></sup>';
+            if (add_message === true) {
+                message.innerHTML = '<sup><em>' + response.data.message + '</em></sup>';
             }
 
             remove_loader();
@@ -42,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function set_loader() {
         var emailField = document.getElementById('edd-email');
         emailField.classList.remove('edd-truemail-success');
-        emailField.classList.remove('edd-truemail-error');
+        emailField.classList.remove('edd-truemail-warning');
         emailField.classList.add('edd-truemail-loading');
     }
 

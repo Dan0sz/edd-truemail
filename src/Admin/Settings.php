@@ -18,6 +18,8 @@ class Settings {
 
     const APP_URL = 'edd_truemail_app_url';
 
+    const BLOCK_PURCHASE = 'edd_truemail_block_checkout';
+
     /**
      * Settings constructor.
      *
@@ -68,12 +70,18 @@ class Settings {
                         'size' => 'large',
                     ],
                     [
-                        'id' => self::APP_URL,
+                        'id'   => self::APP_URL,
                         'name' => __( 'Application URL', 'edd-truemail' ),
                         'desc' => __( 'Enter the URL of your Truemail instance here.', 'edd-truemail' ),
                         'type' => 'text',
                         'size' => 'large',
                     ],
+                    [
+                        'id'   => self::BLOCK_PURCHASE,
+                        'name' => __( 'Prevent Purchase on Failure', 'edd-truemail' ),
+                        'desc' => __( 'If enabled, the user won\'t be able to finalize the purchase if the email address fails to validate. Fails silently on a request timeout.', 'edd-truemail' ),
+                        'type' => 'checkbox',
+                    ]
                 ],
             ]
 		);

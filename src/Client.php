@@ -38,20 +38,23 @@ class Client {
      * Verifies an email address.
      *
      * @param string $email
-     * @return void
+     * @return array [ 'success' => bool, 'code' => int ]
      */
     public function verify( $email ) {
         $email = sanitize_email( $email );
 
         if ( ! $email ) {
-            return false;
+            return [
+				'success' => false,
+				'code'    => 200,
+            ];
         }
 
         $url      = $this->api_url . '?' . http_build_query( [ 'email' => $email ] );
         $response = wp_remote_get(
             $url,
             [
-                'timeout' => 30,
+                'timeout' => 15,
                 'headers' => [
                     'Content-Type'  => 'application/json',
                     'Accept'        => 'application/json',
@@ -61,11 +64,17 @@ class Client {
         );
 
         if ( is_wp_error( $response ) ) {
-            return false;
+            return [
+				'success' => false,
+				'code'    => 408,
+            ];
         }
 
         $body = json_decode( wp_remote_retrieve_body( $response ) );
 
-        return $body->success;
+        return [
+			'success' => $body->success,
+			'code'    => 200,
+        ];
     }
 }

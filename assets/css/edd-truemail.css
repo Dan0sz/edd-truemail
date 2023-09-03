@@ -3,8 +3,8 @@
     background-size: 25px !important;
 }
 
-.edd-truemail-error {
-    background: url(../images/red-cross.png) no-repeat 98% !important;
+.edd-truemail-warning {
+    background: url(../images/exclamation-mark.png) no-repeat 98% !important;
     background-size: 25px !important;
 }
 

@@ -40,19 +40,29 @@ class Ajax {
      * @throws InvalidArgument
      */
     public function verify() {
-        $email  = isset( $_POST['email'] ) ? sanitize_email( $_POST['email'] ) : false;
-        $client = new Client();
-        $result = $client->verify( $email );
+        $email    = isset( $_POST['email'] ) ? sanitize_email( $_POST['email'] ) : false;
+        $client   = new Client();
+        $result   = $client->verify( $email );
+        $response = [
+            'status'  => $result['code'],
+            'success' => false,
+        ];
 
-        if ( ! $result ) {
-            wp_send_json_error( [ 'message' => __( 'Email address doesn\'t seem to exist.', 'edd-truemail' ) ] );
+        if ( ! $result['success'] && $result['code'] === 200 ) {
+            $response['message'] = __( 'We couldn\'t verify your email address. Are you sure it\'s spelled correctly?', 'edd-truemail' );
         }
 
-        wp_send_json_success(
-            [
-				'message' => __( 'Email address verified.', 'edd-truemail' ),
-				'status'  => 200,
-            ]
-        );
+        if ( ! $result['success'] && $result['code'] === 408 ) {
+            $response['message'] = __( 'Request timed out.', 'edd-truemail' );
+        }
+
+        if ( ! $result['success'] ) {
+            wp_send_json_error( $response );
+        }
+
+        $response['message'] = __( 'Email address verified.', 'edd-truemail' );
+        $response['success'] = true;
+
+        wp_send_json_success( $response );
     }
 }

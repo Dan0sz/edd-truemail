@@ -9,6 +9,7 @@
  */
 namespace EDD\Truemail;
 
+use EDD\Truemail\Admin\Settings;
 use WpOrg\Requests\Exception\InvalidArgument;
 
 defined( 'ABSPATH' ) || exit;
@@ -37,15 +38,19 @@ class Plugin {
 	}
 
 	/**
-	 * Enqueues scripts and styles.
+	 * Enqueues scripts and styles. Loads minified versions if SCRIPT_DEBUG is true.
 	 *
 	 * @return void
 	 */
 	public function enqueue_scripts() {
-		if ( edd_is_checkout() ) {
-			wp_enqueue_script( 'edd-truemail', plugin_dir_url( EDD_TM_PLUGIN_FILE ) . 'assets/js/edd-truemail.js', [ 'edd-ajax' ], filemtime( plugin_dir_path( EDD_TM_PLUGIN_FILE ) . 'assets/js/edd-truemail.js' ), false );
-			wp_enqueue_style( 'edd-truemail', plugin_dir_url( EDD_TM_PLUGIN_FILE ) . 'assets/css/edd-truemail.css', [], filemtime( plugin_dir_path( EDD_TM_PLUGIN_FILE ) . 'assets/css/edd-truemail.css' ) );
+		if ( ! edd_is_checkout() ) {
+			return;
 		}
+
+		$ext = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG === true ? '.min' : '';
+
+		wp_enqueue_script( 'edd-truemail', plugin_dir_url( EDD_TM_PLUGIN_FILE ) . "assets/js/edd-truemail$ext.js", [ 'edd-ajax' ], filemtime( plugin_dir_path( EDD_TM_PLUGIN_FILE ) . 'assets/js/edd-truemail.js' ), false );
+		wp_enqueue_style( 'edd-truemail', plugin_dir_url( EDD_TM_PLUGIN_FILE ) . "assets/css/edd-truemail$ext.css", [], filemtime( plugin_dir_path( EDD_TM_PLUGIN_FILE ) . 'assets/css/edd-truemail.css' ) );
 	}
 
 	/**
@@ -61,6 +66,10 @@ class Plugin {
 	 * @throws InvalidArgument
 	 */
 	public function validate_email( $valid_data, $data ) {
+		if ( empty( edd_get_option( Settings::BLOCK_PURCHASE ) ) ) {
+			return;
+		}
+
 		if ( ! isset( $data['edd_email'] ) ) {
 			return;
 		}
@@ -69,7 +78,12 @@ class Plugin {
 		$client = new Client();
 		$result = $client->verify( $email );
 
-		if ( ! $result ) {
+		// Fail silently on a timeout.
+		if ( $result['code'] === 408 ) {
+			return;
+		}
+
+		if ( ! $result['success'] ) {
 			edd_set_error( 'invalid_email', __( 'The email address you entered either contains a typo or it doesn\'t exist.', 'edd-truemail' ) );
 		}
 	}
