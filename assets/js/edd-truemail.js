@@ -17,6 +17,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         var add_message = false;
 
+        message.innerHTML = '';
+
         set_loader();
 
         wp.ajax.post(
@@ -29,7 +31,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Valid email address.
                 emailField.classList.remove('edd-truemail-warning');
                 emailField.classList.add('edd-truemail-success');
-            } else if (response.status === 200 && response.success === false) {
+            }
+
+            remove_loader();
+        }).fail(function (response) {
+            if (response.status === 200 && response.success === false) {
                 // Email address is invalid.
                 emailField.classList.remove('edd-truemail-success');
                 emailField.classList.add('edd-truemail-warning');
@@ -47,8 +53,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 message.innerHTML = '';
             }
 
-            remove_loader();
-        }).fail(function (response) {
             remove_loader();
 
             console.log(response);
