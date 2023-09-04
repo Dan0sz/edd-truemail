@@ -24,7 +24,6 @@ document.addEventListener('DOMContentLoaded', () => {
         form.append('action', 'edd_truemail_verify_email');
         form.append('email', emailField.value);
 
-
         fetch(
             edd_global_vars.ajaxurl,
             {
