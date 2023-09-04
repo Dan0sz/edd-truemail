@@ -34,6 +34,12 @@ document.addEventListener('DOMContentLoaded', () => {
         ).then(
             response => response.json()
         ).then(response => {
+            if (response === 0) {
+                remove_loader();
+
+                return;
+            }
+
             if (response.data.status === 200 && response.data.success === true) {
                 // Valid email address.
                 emailField.classList.remove('edd-truemail-warning');
