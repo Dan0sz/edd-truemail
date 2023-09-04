@@ -42,6 +42,7 @@ class Client {
      */
     public function verify( $email ) {
         if ( empty( $this->token ) || empty( $this->api_url ) ) {
+            // Not Acceptable
             return [
                 'success' => false,
                 'code'    => 406,
