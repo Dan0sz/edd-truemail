@@ -30,6 +30,7 @@ class Ajax {
      */
     private function init() {
         add_action( 'wp_ajax_edd_truemail_verify_email', [ $this, 'verify' ] );
+        add_action( 'wp_ajax_nopriv_edd_truemail_verify_email', [ $this, 'verify' ] );
     }
 
     /**

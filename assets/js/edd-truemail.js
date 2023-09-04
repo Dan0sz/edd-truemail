@@ -20,19 +20,16 @@ document.addEventListener('DOMContentLoaded', () => {
         set_loader();
 
         wp.ajax.post(
-            'edd_truemail_verify_email', { email: emailField.value }
-        ).done(function (response) {
-            if (response === 0) {
-                remove_loader();
-
-                return;
+            'edd_truemail_verify_email',
+            {
+                email: emailField.value
             }
-
-            if (response.data.status === 200 && response.data.success === true) {
+        ).done(function (response) {
+            if (response.status === 200 && response.success === true) {
                 // Valid email address.
                 emailField.classList.remove('edd-truemail-warning');
                 emailField.classList.add('edd-truemail-success');
-            } else if (response.data.status === 200 && response.data.success === false) {
+            } else if (response.status === 200 && response.success === false) {
                 // Email address is invalid.
                 emailField.classList.remove('edd-truemail-success');
                 emailField.classList.add('edd-truemail-warning');
@@ -45,12 +42,16 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             if (add_message === true) {
-                message.innerHTML = '<sup><em>' + response.data.message + '</em></sup>';
+                message.innerHTML = '<sup><em>' + response.message + '</em></sup>';
             } else {
                 message.innerHTML = '';
             }
 
             remove_loader();
+        }).fail(function (response) {
+            remove_loader();
+
+            console.log(response);
         });
     });
 
