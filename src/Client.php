@@ -41,6 +41,13 @@ class Client {
      * @return array [ 'success' => bool, 'code' => int ]
      */
     public function verify( $email ) {
+        if ( empty( $this->token ) || empty( $this->api_url ) ) {
+            return [
+                'success' => false,
+                'code'    => 406,
+            ];
+        }
+
         $email = sanitize_email( $email );
 
         if ( ! $email ) {
