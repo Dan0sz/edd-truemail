@@ -19,20 +19,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         set_loader();
 
-        const form = new FormData();
-
-        form.append('action', 'edd_truemail_verify_email');
-        form.append('email', emailField.value);
-
-        fetch(
-            edd_global_vars.ajaxurl,
-            {
-                method: 'POST',
-                body: form
-            }
-        ).then(
-            response => response.json()
-        ).then(response => {
+        wp.ajax.post(
+            'edd_truemail_verify_email', { email: emailField.value }
+        ).done(function (response) {
             if (response === 0) {
                 remove_loader();
 
