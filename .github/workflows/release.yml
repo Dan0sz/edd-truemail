@@ -2,7 +2,7 @@ name: Build Plugin Release
 
 on:
   release:
-    types: [released]
+    types: [ released ]
 
 jobs:
   build:
