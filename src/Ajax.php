@@ -74,7 +74,9 @@ class Ajax {
 		/**
 		 * Store result in a transient for 10 minutes, so it doesn't slow down the checkout process.
 		 */
-		set_transient( $transient_label, $response, 600 );
+		if ( ! empty( $email ) ) {
+			set_transient( $transient_label, $response, 600 );
+		}
 		
 		if ( ! $result['success'] ) {
 			wp_send_json_error( $response );
