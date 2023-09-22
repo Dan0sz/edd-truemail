@@ -11,7 +11,8 @@ This plugin for WordPress adds Truemail integration to Easy Digital Downloads' c
 
 ## Installation
 
-Releases are listed [here](https://github.com/Dan0sz/edd-truemail/releases). Download the `edd-truemail.zip` file listed with every release in the **Assets** section to download a properly "WordPress-style" packed .zip-file.
+Releases are listed [here](https://github.com/Dan0sz/edd-truemail/releases). Download the `edd-truemail.zip` file listed
+with every release in the **Assets** section to download a properly "WordPress-style" packed .zip-file.
 
 ## Configuration
 
@@ -28,7 +29,8 @@ That's it!
 This plugin adds two things to Easy Digital Downloads' checkout:
 
 1. Instant verification/validation of the entered email address, with feedback:
-   - It shows a green check in the email address field, if validation was successful.
-   - It shows a orange exclamation mark, along with an error message, if validation failed.
-   - In case of a timeout, it will fail silently.
-2. When the **Prevent Purchase on Failure** option is enabled, users will not be able to finalize their purcahse if the email address is incorrect. In case of a timeout, it will fail silently.
+    - It shows a green check in the email address field, if validation was successful.
+    - It shows a orange exclamation mark, along with an error message, if validation failed.
+    - In case of a timeout, it will fail silently.
+2. When the **Prevent Purchase on Failure** option is enabled, users will not be able to finalize their purchase if the
+   email address is incorrect. In case of a timeout, it will fail silently.
