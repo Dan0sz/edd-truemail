@@ -7,6 +7,7 @@
  *            https://daan.dev
  * @copyright © 2023 Daan van den Bergh
  */
+
 namespace EDD\Truemail;
 
 use EDD\Truemail\Admin\Settings;
@@ -21,12 +22,12 @@ class Plugin {
 	 * @return void
 	 */
 	public function __construct() {
-        new Admin\Settings();
+		new Admin\Settings();
 		new Ajax();
-
+		
 		$this->init();
 	}
-
+	
 	/**
 	 * Initializes the class.
 	 *
@@ -36,7 +37,7 @@ class Plugin {
 		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
 		add_action( 'edd_checkout_error_checks', [ $this, 'validate_email' ], 10, 2 );
 	}
-
+	
 	/**
 	 * Enqueues scripts and styles. Loads minified versions if SCRIPT_DEBUG is true.
 	 *
@@ -46,13 +47,16 @@ class Plugin {
 		if ( ! edd_is_checkout() ) {
 			return;
 		}
-
+		
 		$ext = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG === true ? '.min' : '';
-
-		wp_enqueue_script( 'edd-truemail', plugin_dir_url( EDD_TM_PLUGIN_FILE ) . "assets/js/edd-truemail$ext.js", [ 'wp-util', 'edd-ajax' ], filemtime( plugin_dir_path( EDD_TM_PLUGIN_FILE ) . 'assets/js/edd-truemail.js' ), false );
+		
+		wp_enqueue_script( 'edd-truemail', plugin_dir_url( EDD_TM_PLUGIN_FILE ) . "assets/js/edd-truemail$ext.js", [
+			'wp-util',
+			'edd-ajax',
+		],                 filemtime( plugin_dir_path( EDD_TM_PLUGIN_FILE ) . 'assets/js/edd-truemail.js' ), false );
 		wp_enqueue_style( 'edd-truemail', plugin_dir_url( EDD_TM_PLUGIN_FILE ) . "assets/css/edd-truemail$ext.css", [], filemtime( plugin_dir_path( EDD_TM_PLUGIN_FILE ) . 'assets/css/edd-truemail.css' ) );
 	}
-
+	
 	/**
 	 * Validates the email address.
 	 *
@@ -69,20 +73,25 @@ class Plugin {
 		if ( empty( edd_get_option( Settings::BLOCK_PURCHASE ) ) ) {
 			return;
 		}
-
+		
 		if ( ! isset( $data['edd_email'] ) ) {
 			return;
 		}
-
-		$email  = sanitize_email( $data['edd_email'] );
-		$client = new Client();
-		$result = $client->verify( $email );
-
+		
+		$email           = sanitize_email( $data['edd_email'] );
+		$transient_label = sprintf( Ajax::TRANSIENT_LABEL, preg_replace( '/\W/', '_', $email ) );
+		$result          = get_transient( $transient_label );
+		
+		if ( empty( $result ) ) {
+			$client = new Client();
+			$result = $client->verify( $email );
+		}
+		
 		// Fail silently on a timeout.
 		if ( $result['code'] === 408 ) {
 			return;
 		}
-
+		
 		if ( ! $result['success'] ) {
 			edd_set_error( 'invalid_email', __( 'The email address you entered either contains a typo or it doesn\'t exist.', 'edd-truemail' ) );
 		}

@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 email: emailField.value
             }
         ).done(function (response) {
-            if (response.status === 200 && response.success === true) {
+            if (response.code === 200 && response.success === true) {
                 // Valid email address.
                 emailField.classList.remove('edd-truemail-warning');
                 emailField.classList.add('edd-truemail-success');
@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             remove_loader();
         }).fail(function (response) {
-            if (response.status === 200 && response.success === false) {
+            if (response.code === 200 && response.success === false) {
                 // Email address is invalid.
                 emailField.classList.remove('edd-truemail-success');
                 emailField.classList.add('edd-truemail-warning');
