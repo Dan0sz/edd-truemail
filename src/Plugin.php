@@ -82,13 +82,11 @@ class Plugin {
 		$transient_label = sprintf( Ajax::TRANSIENT_LABEL, preg_replace( '/\W/', '_', $email ) );
 		$result          = get_transient( $transient_label );
 		
-		if ( empty( $result ) ) {
-			$client = new Client();
-			$result = $client->verify( $email );
-		}
-		
-		// Fail silently on a timeout.
-		if ( $result['code'] === 408 ) {
+		/**
+		 * If transient isn't available, this probably means that a logged-in user placed a purchase, without changing
+		 * his/her email. Which is a perfectly valid scenario, which is why we fail silently here. Same goes for time-outs.
+		 */
+		if ( empty( $result ) || $result['code'] === 408 ) {
 			return;
 		}
 		
