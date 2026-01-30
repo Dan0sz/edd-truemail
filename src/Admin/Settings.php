@@ -2,13 +2,13 @@
 /**
  * Truemail for Easy Digital Downloads
  *
- * @package   daandev/correct-contacts
+ * @package   daandev/correct-contact
  * @author    Daan van den Bergh
  *            https://daan.dev
  * @copyright © 2023-2026 Daan van den Bergh
  */
 
-namespace CorrectContacts\Admin;
+namespace CorrectContact\Admin;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -31,7 +31,7 @@ class Settings {
     /**
      * Settings constructor.
      */
-	public function __construct() {
+    public function __construct() {
         $this->active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( $_GET['tab'] ) : self::SETTINGS_FIELD_GENERAL;
 
         add_action( 'admin_menu', [ $this, 'add_menu' ] );
@@ -45,58 +45,58 @@ class Settings {
         // Content
         add_action( 'cc_settings_content', [ $this, 'general_settings_content' ], 1 );
         add_action( 'cc_settings_content', [ $this, 'advanced_settings_content' ], 2 );
-	}
+    }
 
     /**
      * Add the settings menu.
      */
     public function add_menu() {
         add_options_page(
-                __( 'Correct Contacts', 'correct-contacts' ),
-                __( 'Correct Contacts', 'correct-contacts' ),
+                __( 'Correct Contact', 'correct-contact' ),
+                __( 'Correct Contact', 'correct-contact' ),
                 'manage_options',
-                'correct-contacts',
+                'correct-contact',
                 [ $this, 'render_settings_page' ]
         );
-	}
+    }
 
-	/**
+    /**
      * Register settings.
-	 */
+     */
     public function register_settings() {
         $settings_config = [
                 self::SETTINGS_FIELD_GENERAL  => [
                         'section_id'    => 'cc_general_section',
-                        'section_title' => __( 'General Settings', 'correct-contacts' ),
+                        'section_title' => __( 'General Settings', 'correct-contact' ),
                         'settings'      => [
                                 self::FIELD_SELECTORS => [
-                                        'label'             => __( 'Fields to Validate', 'correct-contacts' ),
+                                        'label'             => __( 'Fields to Validate', 'correct-contact' ),
                                         'callback'          => [ $this, 'render_selectors_field' ],
-                                        'desc'              => __( 'Add the CSS selectors (classes or IDs) of the email fields you want to validate. Press enter after each entry.', 'correct-contacts' ),
+                                        'desc'              => __( 'Add the CSS selectors (classes or IDs) of the email fields you want to validate. Press enter after each entry.', 'correct-contact' ),
                                         'sanitize_callback' => [ $this, 'sanitize_selectors' ],
                                 ],
                                 self::BLOCK_PURCHASE  => [
-                                        'label'             => __( 'Prevent Purchase on Failure', 'correct-contacts' ),
+                                        'label'             => __( 'Prevent Purchase on Failure', 'correct-contact' ),
                                         'callback'          => [ $this, 'render_checkbox_field' ],
-                                        'desc'              => __( 'If enabled, the user won\'t be able to finalize the purchase in WooCommerce and Easy Digital Downloads if the email address fails to validate. Fails silently on a request timeout.', 'correct-contacts' ),
+                                        'desc'              => __( 'If enabled, the user won\'t be able to finalize the purchase in WooCommerce and Easy Digital Downloads if the email address fails to validate. Fails silently on a request timeout.', 'correct-contact' ),
                                         'sanitize_callback' => null,
                                 ],
                         ],
                 ],
                 self::SETTINGS_FIELD_ADVANCED => [
                         'section_id'    => 'cc_advanced_section',
-                        'section_title' => __( 'Advanced Settings', 'correct-contacts' ),
+                        'section_title' => __( 'Advanced Settings', 'correct-contact' ),
                         'settings'      => [
                                 self::ACCESS_TOKEN => [
-                                        'label'             => __( 'Access Token', 'correct-contacts' ),
+                                        'label'             => __( 'Access Token', 'correct-contact' ),
                                         'callback'          => [ $this, 'render_text_field' ],
-                                        'desc'              => __( 'Enter the Access Token (environment variable) you\'ve configured in your Truemail instance here.', 'correct-contacts' ),
+                                        'desc'              => __( 'Enter the Access Token (environment variable) you\'ve configured in your Truemail instance here.', 'correct-contact' ),
                                         'sanitize_callback' => null,
                                 ],
                                 self::APP_URL      => [
-                                        'label'             => __( 'Application URL', 'correct-contacts' ),
+                                        'label'             => __( 'Application URL', 'correct-contact' ),
                                         'callback'          => [ $this, 'render_text_field' ],
-                                        'desc'              => __( 'Enter the URL of your Truemail instance here.', 'correct-contacts' ),
+                                        'desc'              => __( 'Enter the URL of your Truemail instance here.', 'correct-contact' ),
                                         'sanitize_callback' => null,
                                 ],
                         ],
@@ -121,7 +121,7 @@ class Settings {
             add_settings_section(
                     $config['section_id'],
                     $config['section_title'],
-                null,
+                    null,
                     $this->active_tab
             );
 
@@ -145,7 +145,7 @@ class Settings {
      * Enqueue Select2 and admin styles for the settings page.
      */
     public function enqueue_assets( $hook ) {
-        if ( $hook !== 'settings_page_correct-contacts' ) {
+        if ( $hook !== 'settings_page_correct-contact' ) {
             return;
         }
 
@@ -161,7 +161,7 @@ class Settings {
 				$('#cc_field_selectors').select2({
 					tags: true,
 					tokenSeparators: [',', ' '],
-					placeholder: '" . __( 'Add selectors...', 'correct-contacts' ) . "'
+					placeholder: '" . __( 'Add selectors...', 'correct-contact' ) . "'
 				});
 			});
 		" );
@@ -233,6 +233,17 @@ class Settings {
     }
 
     /**
+     * General Settings tab.
+     */
+    public function general_settings_tab() {
+        $this->generate_tab(
+                self::SETTINGS_FIELD_GENERAL,
+                'dashicons-admin-settings',
+                __( 'General', 'correct-contact' )
+        );
+    }
+
+    /**
      * Generate a tab.
      *
      * @param string $id
@@ -243,21 +254,10 @@ class Settings {
         $active = $this->active_tab === $id ? 'nav-tab-active' : '';
         ?>
         <a class="nav-tab dashicons-before <?php echo esc_attr( $icon ); ?> <?php echo esc_attr( $active ); ?>"
-           href="<?php echo esc_url( admin_url( 'options-general.php?page=correct-contacts&tab=' . $id ) ); ?>">
+           href="<?php echo esc_url( admin_url( 'options-general.php?page=correct-contact&tab=' . $id ) ); ?>">
             <?php echo esc_html( $label ); ?>
         </a>
         <?php
-    }
-
-    /**
-     * General Settings tab.
-     */
-    public function general_settings_tab() {
-        $this->generate_tab(
-                self::SETTINGS_FIELD_GENERAL,
-                'dashicons-admin-settings',
-                __( 'General', 'correct-contacts' )
-        );
     }
 
     /**
@@ -267,7 +267,7 @@ class Settings {
         $this->generate_tab(
                 self::SETTINGS_FIELD_ADVANCED,
                 'dashicons-admin-generic',
-                __( 'Advanced', 'correct-contacts' )
+                __( 'Advanced', 'correct-contact' )
         );
     }
 

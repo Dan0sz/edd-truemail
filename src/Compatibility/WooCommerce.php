@@ -2,15 +2,15 @@
 /**
  * WooCommerce Compatibility
  *
- * @package   daandev/correct-contacts
+ * @package   daandev/correct-contact
  * @author    Daan van den Bergh
  *            https://daan.dev
  * @copyright © 2023-2026 Daan van den Bergh
  */
 
-namespace CorrectContacts\Compatibility;
+namespace CorrectContact\Compatibility;
 
-use CorrectContacts\Compatibility;
+use CorrectContact\Compatibility;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -52,6 +52,6 @@ class WooCommerce extends Compatibility {
 	 * @return void
 	 */
 	protected function set_validation_error( $errors ) {
-		$errors->add( 'invalid_email', __( 'The email address you entered either contains a typo or it doesn\'t exist.', 'correct-contacts' ) );
+		$errors->add( 'invalid_email', __( 'The email address you entered either contains a typo or it doesn\'t exist.', 'correct-contact' ) );
 	}
 }

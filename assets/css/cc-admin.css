@@ -1,7 +1,7 @@
 /**
- * Correct Contacts Admin Styles
+ * Correct Contact Admin Styles
  *
- * @package   daandev/correct-contacts
+ * @package   daandev/correct-contact
  * @author    Daan van den Bergh
  * @copyright © 2025 Daan van den Bergh
  */
@@ -15,17 +15,17 @@
  * Typography
  */
 #wpwrap {
-	background-color: rgb(248 250 252 / 1);
+    background-color: rgb(248 250 252 / 1);
 }
 
 .cc-admin {
-	font-family: 'Public Sans', Arial, sans-serif;
-	max-width: 1350px;
+    font-family: 'Public Sans', Arial, sans-serif;
+    max-width: 1350px;
 }
 
 .cc-admin h1 {
-	font-family: 'Poppins', Verdana, sans-serif;
-	font-weight: 800;
+    font-family: 'Poppins', Verdana, sans-serif;
+    font-weight: 800;
 }
 
 .cc-admin h2,
@@ -33,27 +33,27 @@
 .cc-admin h4,
 .cc-admin h5,
 .cc-admin h6 {
-	font-family: 'Poppins', Verdana, sans-serif;
-	font-weight: 500;
+    font-family: 'Poppins', Verdana, sans-serif;
+    font-weight: 500;
 }
 
 /**
  * Buttons
  */
 .cc-admin .button {
-	font-family: 'Poppins', Verdana, sans-serif;
-	border-radius: 10px;
-	font-weight: 500;
+    font-family: 'Poppins', Verdana, sans-serif;
+    border-radius: 10px;
+    font-weight: 500;
 }
 
 .cc-admin #submit {
-	background: #00adda;
-	border: 0;
-	padding: 7px 20px;
+    background: #00adda;
+    border: 0;
+    padding: 7px 20px;
 }
 
 .cc-admin #submit:hover {
-	background-color: #0099cc;
+    background-color: #0099cc;
 }
 
 /**
@@ -91,18 +91,18 @@
  * Settings Container
  */
 .cc-settings-container {
-	background-color: #fff;
-	padding: 5px 25px 50px;
+    background-color: #fff;
+    padding: 5px 25px 50px;
     margin: 0 auto 2em;
-	overflow: visible;
-	border: 0;
-	border-top: 4px solid #00adda;
-	border-radius: 10px;
-	box-shadow: 0px 10px 20px 1px #ccc;
+    overflow: visible;
+    border: 0;
+    border-top: 4px solid #00adda;
+    border-radius: 10px;
+    box-shadow: 0px 10px 20px 1px #ccc;
 }
 
 .cc-settings-container .form-table tr {
-	position: relative;
+    position: relative;
 }
 
 .cc-settings-container .form-table tr td {
@@ -111,12 +111,12 @@
 
 .cc-settings-container p,
 .cc-settings-container ul {
-	text-align: justify;
-	font-size: 14px;
+    text-align: justify;
+    font-size: 14px;
 }
 
 .cc-settings-container .form-table th {
-	font-weight: 600;
+    font-weight: 600;
 }
 
 /**
@@ -125,12 +125,12 @@
 .cc-admin input[type="text"],
 .cc-admin input[type="checkbox"],
 .cc-admin select {
-	font-family: 'Public Sans', Arial, sans-serif;
+    font-family: 'Public Sans', Arial, sans-serif;
 }
 
 .cc-admin .regular-text {
-	width: 100%;
-	max-width: 500px;
+    width: 100%;
+    max-width: 500px;
 }
 
 .cc-admin input[type="checkbox"] {
@@ -146,24 +146,24 @@
  * Select2 Customization
  */
 .cc-admin .select2-container {
-	font-family: 'Public Sans', Arial, sans-serif;
+    font-family: 'Public Sans', Arial, sans-serif;
 }
 
 .cc-admin .select2-container--default .select2-selection--multiple {
-	border-radius: 5px;
-	border-color: #8c8f94;
+    border-radius: 5px;
+    border-color: #8c8f94;
 }
 
 .cc-admin .select2-container--default.select2-container--focus .select2-selection--multiple {
-	border-color: #00adda;
-	box-shadow: 0 0 0 1px #00adda;
+    border-color: #00adda;
+    box-shadow: 0 0 0 1px #00adda;
 }
 
 .cc-admin .select2-container--default .select2-selection--multiple .select2-selection__choice {
     background-color: #ebfdff;
-	border-color: #0099cc;
+    border-color: #0099cc;
     color: #00adda;
-	border-radius: 5px;
+    border-radius: 5px;
     padding: 3px 5px 2px 18px;
     margin: 3px 0 0 2px;
 }
@@ -176,7 +176,7 @@
 }
 
 .cc-admin .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
-	color: #fff;
+    color: #fff;
     background-color: #00adda;
 }
 
@@ -184,7 +184,7 @@
  * Responsive
  */
 @media only screen and (max-width: 782px) {
-	.cc-settings-container {
-		margin: 20px 0;
-	}
+    .cc-settings-container {
+        margin: 20px 0;
+    }
 }

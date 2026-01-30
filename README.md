@@ -1,4 +1,4 @@
-# Correct Contacts for WordPress
+# Correct Contact for WordPress
 
 This plugin adds email address validation to any field in any WordPress form.
 
@@ -14,7 +14,7 @@ Download the plugin and install it via the WordPress admin area.
 
 ## Configuration
 
-This plugin's options are available under Settings > Correct Contacts:
+This plugin's options are available under Settings > Correct Contact:
 
 1. Enter your Access Token,
 2. The public URL of your TrueMail instance,
@@ -31,4 +31,6 @@ This plugin adds the following to the configured fields:
     - It shows a green check in the email address field if validation was successful.
     - It shows an orange exclamation mark, along with an error message, if validation failed.
     - In case of a timeout, it will fail silently.
-2. If the **Prevent Purchase on Failure** option is enabled, and the field is within an Easy Digital Downloads checkout form, users will not be able to finalize their purchase if the email address is incorrect. In case of a timeout, it will fail silently.
+2. If the **Prevent Purchase on Failure** option is enabled, and the field is within an Easy Digital Downloads checkout
+   form, users will not be able to finalize their purchase if the email address is incorrect. In case of a timeout, it
+   will fail silently.

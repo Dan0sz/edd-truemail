@@ -2,15 +2,15 @@
 /**
  * Truemail for Easy Digital Downloads
  *
- * @package   daandev/correct-contacts
+ * @package   daandev/correct-contact
  * @author    Daan van den Bergh
  *            https://daan.dev
  * @copyright © 2023-2026 Daan van den Bergh
  */
 
-namespace CorrectContacts;
+namespace CorrectContact;
 
-use CorrectContacts\Admin\Settings;
+use CorrectContact\Admin\Settings;
 use WpOrg\Requests\Exception\InvalidArgument;
 
 defined( 'ABSPATH' ) || exit;
@@ -47,14 +47,14 @@ class Plugin {
 	public function enqueue_scripts() {
 		$ext = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG === true ? '.min' : '';
 		
-		wp_enqueue_script( 'correct-contacts', plugin_dir_url( CC_PLUGIN_FILE ) . "assets/js/correct-contacts$ext.js", [
+		wp_enqueue_script( 'correct-contact', plugin_dir_url( CC_PLUGIN_FILE ) . "assets/js/correct-contacts$ext.js", [
 			'wp-util',
-		], filemtime( plugin_dir_path( CC_PLUGIN_FILE ) . 'assets/js/correct-contacts.js' ), false );
-		wp_enqueue_style( 'correct-contacts', plugin_dir_url( CC_PLUGIN_FILE ) . "assets/css/correct-contacts$ext.css", [], filemtime( plugin_dir_path( CC_PLUGIN_FILE ) . 'assets/css/correct-contacts.css' ) );
+		], filemtime( plugin_dir_path( CC_PLUGIN_FILE ) . 'assets/js/correct-contact.js' ), false );
+		wp_enqueue_style( 'correct-contact', plugin_dir_url( CC_PLUGIN_FILE ) . "assets/css/correct-contacts$ext.css", [], filemtime( plugin_dir_path( CC_PLUGIN_FILE ) . 'assets/css/correct-contacts.css' ) );
 		
 		$selectors = get_option( Settings::FIELD_SELECTORS, '#edd-email' );
 		
-		wp_localize_script( 'correct-contacts', 'cc_ajax_obj', [
+		wp_localize_script( 'correct-contact', 'cc_ajax_obj', [
 			'ajax_url'  => admin_url( 'admin-ajax.php' ),
 			'selectors' => $selectors,
 		] );

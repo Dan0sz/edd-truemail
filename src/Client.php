@@ -2,15 +2,15 @@
 /**
  * Truemail for Easy Digital Downloads
  *
- * @package   daandev/correct-contacts
+ * @package   daandev/correct-contact
  * @author    Daan van den Bergh
  *            https://daan.dev
  * @copyright © 2023-2026 Daan van den Bergh
  */
 
-namespace CorrectContacts;
+namespace CorrectContact;
 
-use CorrectContacts\Admin\Settings;
+use CorrectContact\Admin\Settings;
 
 defined( 'ABSPATH' ) || exit;
 

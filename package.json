@@ -1,5 +1,5 @@
 {
-  "name": "correct-contacts",
+  "name": "correct-contact",
   "version": "1.0.0",
   "description": "This plugin adds email address validation to any field in any WordPress form.",
   "main": "index.js",

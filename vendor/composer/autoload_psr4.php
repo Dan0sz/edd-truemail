@@ -6,5 +6,5 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
-    'CorrectContacts\\' => array($baseDir . '/src'),
+    'CorrectContact\\' => array($baseDir . '/src'),
 );

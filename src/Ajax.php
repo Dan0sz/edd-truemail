@@ -2,13 +2,13 @@
 /**
  * Truemail for Easy Digital Downloads
  *
- * @package   daandev/correct-contacts
+ * @package   daandev/correct-contact
  * @author    Daan van den Bergh
  *            https://daan.dev
  * @copyright © 2023-2026 Daan van den Bergh
  */
 
-namespace CorrectContacts;
+namespace CorrectContact;
 
 use WpOrg\Requests\Exception\InvalidArgument;
 
@@ -53,19 +53,19 @@ class Ajax {
 		];
 		
 		if ( ! $result['success'] && $result['code'] === 200 ) {
-			$response['message'] = __( 'We couldn\'t verify your email address. Are you sure it\'s spelled correctly?', 'correct-contacts' );
+			$response['message'] = __( 'We couldn\'t verify your email address. Are you sure it\'s spelled correctly?', 'correct-contact' );
 		}
 		
 		if ( ! $result['success'] && $result['code'] === 400 ) {
-			$response['message'] = __( 'Please enter a valid email address.', 'correct-contacts' );
+			$response['message'] = __( 'Please enter a valid email address.', 'correct-contact' );
 		}
 		
 		if ( ! $result['success'] && $result['code'] === 408 ) {
-			$response['message'] = __( 'Request timed out.', 'correct-contacts' );
+			$response['message'] = __( 'Request timed out.', 'correct-contact' );
 		}
 		
 		if ( $result['success'] && $result['code'] === 200 ) {
-			$response['message'] = __( 'Email address verified.', 'correct-contacts' );
+			$response['message'] = __( 'Email address verified.', 'correct-contact' );
 			$response['success'] = true;
 		}
 		
