@@ -1,0 +1,28 @@
+{
+  "name": "correct-contacts",
+  "version": "1.0.0",
+  "description": "This plugin adds email address validation to any field in any WordPress form.",
+  "main": "index.js",
+  "scripts": {
+    "prod": "node scripts/minify-all.js",
+    "watch": "chokidar 'assets/js/**/*.js' 'assets/css/**/*.css' -i 'assets/**/*.min.*' -c 'npm run prod'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Dan0sz/edd-truemail.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/Dan0sz/edd-truemail/issues"
+  },
+  "homepage": "https://github.com/Dan0sz/edd-truemail#readme",
+  "devDependencies": {
+    "chokidar-cli": "^3.0.0",
+    "clean-css": "^5.3.3",
+    "glob": "^13.0.0",
+    "uglify-js": "^3.19.3"
+  }
+}

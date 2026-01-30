@@ -8,3 +8,7 @@ vendor/*
 !vendor/composer/
 !vendor/autoload.php
 config.php
+
+node_modules/
+release/
+*.zip

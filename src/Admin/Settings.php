@@ -5,7 +5,7 @@
  * @package   daandev/correct-contacts
  * @author    Daan van den Bergh
  *            https://daan.dev
- * @copyright © 2023 Daan van den Bergh
+ * @copyright © 2023-2026 Daan van den Bergh
  */
 
 namespace CorrectContacts\Admin;
