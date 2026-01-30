@@ -107,13 +107,17 @@ class Settings {
 	}
 
     /**
-     * Enqueue Select2 for the settings page.
+     * Enqueue Select2 and admin styles for the settings page.
      */
     public function enqueue_assets( $hook ) {
         if ( $hook !== 'settings_page_correct-contacts' ) {
             return;
         }
 
+        // Enqueue admin styles
+        wp_enqueue_style( 'cc-admin', plugin_dir_url( CC_PLUGIN_FILE ) . 'assets/css/cc-admin.css', [], filemtime( plugin_dir_path( CC_PLUGIN_FILE ) . 'assets/css/cc-admin.css' ) );
+
+        // Enqueue Select2
         wp_enqueue_style( 'select2', 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css' );
         wp_enqueue_script( 'select2', 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js', [ 'jquery' ] );
 
@@ -179,14 +183,16 @@ class Settings {
      */
     public function render_settings_page() {
         ?>
-        <div class="wrap">
+        <div class="wrap cc-admin">
             <h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
             <form action="options.php" method="post">
-                <?php
-                settings_fields( 'correct-contacts' );
-                do_settings_sections( 'correct-contacts' );
-                submit_button();
-                ?>
+                <div class="cc-settings-container">
+                    <?php
+                    settings_fields( 'correct-contacts' );
+                    do_settings_sections( 'correct-contacts' );
+                    ?>
+                </div>
+                <?php submit_button(); ?>
             </form>
         </div>
         <?php
