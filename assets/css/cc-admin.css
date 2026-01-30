@@ -124,12 +124,15 @@
 	border-color: #0099cc;
 	color: #fff;
 	border-radius: 5px;
-	padding: 3px 8px;
+    padding: 3px 0 2px 15px;
+    margin-top: 3px;
 }
 
 .cc-admin .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
 	color: #fff;
-	margin-right: 5px;
+    margin-right: 8px;
+    padding: 4px 5px;
+    border-right: none;
 }
 
 .cc-admin .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
