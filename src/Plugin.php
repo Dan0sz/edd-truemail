@@ -24,6 +24,8 @@ class Plugin {
 	public function __construct() {
 		new Admin\Settings();
 		new Ajax();
+		new Compatibility\EDD();
+		new Compatibility\WooCommerce();
 		
 		$this->init();
 	}
@@ -35,8 +37,6 @@ class Plugin {
 	 */
 	private function init() {
 		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
-		add_action( 'edd_checkout_error_checks', [ $this, 'validate_email_edd' ], 10, 2 );
-		add_action( 'woocommerce_after_checkout_validation', [ $this, 'validate_email_woocommerce' ], 10, 2 );
 	}
 	
 	/**
@@ -58,81 +58,5 @@ class Plugin {
 			'ajax_url'  => admin_url( 'admin-ajax.php' ),
 			'selectors' => $selectors,
 		] );
-	}
-	
-	/**
-	 * Validates the email address for Easy Digital Downloads checkout.
-	 *
-	 * @action edd_checkout_error_checks.
-	 *
-	 * @param mixed $valid_data
-	 * @param mixed $data
-	 *
-	 * @return void
-	 *
-	 * @throws InvalidArgument
-	 */
-	public function validate_email_edd( $valid_data, $data ) {
-		if ( empty( get_option( Settings::BLOCK_PURCHASE ) ) ) {
-			return;
-		}
-		
-		if ( ! isset( $data['edd_email'] ) ) {
-			return;
-		}
-		
-		$email           = sanitize_email( $data['edd_email'] );
-		$transient_label = sprintf( Ajax::TRANSIENT_LABEL, preg_replace( '/\W/', '_', $email ) );
-		$result          = get_transient( $transient_label );
-		
-		/**
-		 * If transient isn't available, this probably means that a logged-in user placed a purchase, without changing
-		 * his/her email. Which is a perfectly valid scenario, which is why we fail silently here. Same goes for time-outs.
-		 */
-		if ( empty( $result ) || $result['code'] === 408 ) {
-			return;
-		}
-		
-		if ( ! $result['success'] ) {
-			edd_set_error( 'invalid_email', __( 'The email address you entered either contains a typo or it doesn\'t exist.', 'correct-contacts' ) );
-		}
-	}
-	
-	/**
-	 * Validates the email address for WooCommerce checkout.
-	 *
-	 * @action woocommerce_after_checkout_validation.
-	 *
-	 * @param array $data An array of posted data.
-	 * @param WP_Error $errors Validation errors.
-	 *
-	 * @return void
-	 *
-	 * @throws InvalidArgument
-	 */
-	public function validate_email_woocommerce( $data, $errors ) {
-		if ( empty( get_option( Settings::BLOCK_PURCHASE ) ) ) {
-			return;
-		}
-		
-		if ( ! isset( $data['billing_email'] ) ) {
-			return;
-		}
-		
-		$email           = sanitize_email( $data['billing_email'] );
-		$transient_label = sprintf( Ajax::TRANSIENT_LABEL, preg_replace( '/\W/', '_', $email ) );
-		$result          = get_transient( $transient_label );
-		
-		/**
-		 * If transient isn't available, this probably means that a logged-in user placed a purchase, without changing
-		 * his/her email. Which is a perfectly valid scenario, which is why we fail silently here. Same goes for time-outs.
-		 */
-		if ( empty( $result ) || $result['code'] === 408 ) {
-			return;
-		}
-		
-		if ( ! $result['success'] ) {
-			$errors->add( 'invalid_email', __( 'The email address you entered either contains a typo or it doesn\'t exist.', 'correct-contacts' ) );
-		}
 	}
 }
