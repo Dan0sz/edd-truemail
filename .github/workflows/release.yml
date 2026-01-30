@@ -17,21 +17,29 @@ jobs:
         with:
           dev: no
 
-      - uses: actions/setup-node@v1
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: "16"
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build production assets
+        run: npm run prod
 
       - name: Generate plugin artifact
         run: |
           rsync -rc --exclude-from="$GITHUB_WORKSPACE/.distignore" "$GITHUB_WORKSPACE/" release/ --delete --delete-excluded
           cd "${GITHUB_WORKSPACE}/release" || exit
-          zip -r "${GITHUB_WORKSPACE}/edd-truemail.zip" .
+          zip -r "${GITHUB_WORKSPACE}/correct-contact.zip" .
       - name: Upload release asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ${{github.workspace}}/edd-truemail.zip
-          asset_name: edd-truemail.zip
+          asset_path: ${{github.workspace}}/correct-contact.zip
+          asset_name: correct-contact.zip
           asset_content_type: application/zip
