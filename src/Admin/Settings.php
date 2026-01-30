@@ -96,7 +96,7 @@ class Settings {
 
         add_settings_field(
                 self::FIELD_SELECTORS,
-                __( 'Field Selectors', 'correct-contacts' ),
+                __( 'Fields to Validate', 'correct-contacts' ),
                 [ $this, 'render_selectors_field' ],
                 'correct-contacts',
                 'cc_general_section',
