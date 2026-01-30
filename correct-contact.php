@@ -1,8 +1,8 @@
 <?php
 /**
- * Plugin Name: Correct Contact for WordPress
+ * Plugin Name: Correct Contact - Email Verification for WordPress.
  * Plugin URI: https://correct.contact
- * Description: This plugin adds email address validation to any field in any WordPress form
+ * Description: Validate email addresses in WordPress forms and checkouts using your own infrastructure. No third-party services required.
  * Version: 1.1.8
  * Author: Daan from Daan.dev
  * Author URI: https://daan.dev/about/

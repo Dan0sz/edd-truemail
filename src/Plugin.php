@@ -1,6 +1,6 @@
 <?php
 /**
- * Truemail for Easy Digital Downloads
+ * Correct Contact - Email Validation for WordPress.
  *
  * @package   daandev/correct-contact
  * @author    Daan van den Bergh
@@ -11,6 +11,7 @@
 namespace CorrectContact;
 
 use CorrectContact\Admin\Settings;
+use CorrectContact\Options;
 use WpOrg\Requests\Exception\InvalidArgument;
 
 defined( 'ABSPATH' ) || exit;
@@ -52,7 +53,7 @@ class Plugin {
 		], filemtime( plugin_dir_path( CC_PLUGIN_FILE ) . 'assets/js/correct-contact.js' ), false );
 		wp_enqueue_style( 'correct-contact', plugin_dir_url( CC_PLUGIN_FILE ) . "assets/css/correct-contacts$ext.css", [], filemtime( plugin_dir_path( CC_PLUGIN_FILE ) . 'assets/css/correct-contacts.css' ) );
 		
-		$selectors = get_option( Settings::FIELD_SELECTORS, '#edd-email' );
+		$selectors = Options::get( Settings::FIELD_SELECTORS, '' );
 		
 		wp_localize_script( 'correct-contact', 'cc_ajax_obj', [
 			'ajax_url'  => admin_url( 'admin-ajax.php' ),

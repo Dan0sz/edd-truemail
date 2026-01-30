@@ -1,6 +1,6 @@
 <?php
 /**
- * Truemail for Easy Digital Downloads
+ * Correct Contact - Email validation for WordPress
  *
  * @package   daandev/correct-contact
  * @author    Daan van den Bergh
@@ -10,9 +10,13 @@
 
 namespace CorrectContact\Admin;
 
+use CorrectContact\Options;
+
 defined( 'ABSPATH' ) || exit;
 
 class Settings {
+    const OPTION_NAME = Options::OPTION_NAME;
+
     const ACCESS_TOKEN = 'cc_access_token';
 
     const APP_URL = 'cc_app_url';
@@ -104,15 +108,18 @@ class Settings {
         ];
 
         // Register all settings
-        foreach ( $settings_config as $tab => $config ) {
-            foreach ( $config['settings'] as $setting_id => $setting ) {
-                $args = [];
-                if ( $setting['sanitize_callback'] ) {
-                    $args['sanitize_callback'] = $setting['sanitize_callback'];
-                }
-                register_setting( $tab, $setting_id, $args );
-            }
-        }
+        register_setting( self::SETTINGS_FIELD_GENERAL, self::OPTION_NAME, [
+                'sanitize_callback' => [
+                        $this,
+                        'sanitize'
+                ]
+        ] );
+        register_setting( self::SETTINGS_FIELD_ADVANCED, self::OPTION_NAME, [
+                'sanitize_callback' => [
+                        $this,
+                        'sanitize'
+                ]
+        ] );
 
         // Add sections and fields for active tab
         if ( isset( $settings_config[ $this->active_tab ] ) ) {
@@ -135,6 +142,7 @@ class Settings {
                         [
                                 'id'   => $setting_id,
                                 'desc' => $setting['desc'],
+                                'name' => self::OPTION_NAME . "[$setting_id]",
                         ]
                 );
             }
@@ -171,8 +179,8 @@ class Settings {
      * Render text field.
      */
     public function render_text_field( $args ) {
-        $value = get_option( $args['id'] );
-        echo '<input type="text" id="' . esc_attr( $args['id'] ) . '" name="' . esc_attr( $args['id'] ) . '" value="' . esc_attr( $value ) . '" class="regular-text">';
+        $value = Options::get( $args['id'] );
+        echo '<input type="text" id="' . esc_attr( $args['id'] ) . '" name="' . esc_attr( $args['name'] ) . '" value="' . esc_attr( $value ) . '" class="regular-text">';
         echo '<p class="description">' . esc_html( $args['desc'] ) . '</p>';
     }
 
@@ -180,9 +188,9 @@ class Settings {
      * Render checkbox field.
      */
     public function render_checkbox_field( $args ) {
-        $value = get_option( $args['id'] );
+        $value = Options::get( $args['id'] );
         echo '<label for="' . esc_attr( $args['id'] ) . '">';
-        echo '<input type="checkbox" id="' . esc_attr( $args['id'] ) . '" name="' . esc_attr( $args['id'] ) . '" value="1" ' . checked( 1, $value, false ) . '>';
+        echo '<input type="checkbox" id="' . esc_attr( $args['id'] ) . '" name="' . esc_attr( $args['name'] ) . '" value="1" ' . checked( 1, $value, false ) . '>';
         echo esc_html( $args['desc'] );
         echo '</label>';
     }
@@ -191,9 +199,9 @@ class Settings {
      * Render selectors field using Select2.
      */
     public function render_selectors_field( $args ) {
-        $value     = get_option( $args['id'], '#edd-email' );
-        $selectors = explode( ',', $value );
-        echo '<select id="' . esc_attr( $args['id'] ) . '" name="' . esc_attr( $args['id'] ) . '[]" class="regular-text" multiple="multiple" style="width: 100%;">';
+        $value     = Options::get( $args['id'], [] );
+        $selectors = is_array( $value ) ? $value : explode( ',', $value );
+        echo '<select id="' . esc_attr( $args['id'] ) . '" name="' . esc_attr( $args['name'] ) . '[]" class="regular-text" multiple="multiple" style="width: 100%;">';
         foreach ( $selectors as $selector ) {
             $selector = trim( $selector );
             if ( ! empty( $selector ) ) {
@@ -202,6 +210,29 @@ class Settings {
         }
         echo '</select>';
         echo '<p class="description">' . esc_html( $args['desc'] ) . '</p>';
+    }
+
+    /**
+     * Sanitize all settings.
+     */
+    public function sanitize( $input ) {
+        if ( isset( $input[ self::FIELD_SELECTORS ] ) ) {
+            $input[ self::FIELD_SELECTORS ] = $this->sanitize_selectors( $input[ self::FIELD_SELECTORS ] );
+        }
+
+        if ( isset( $input[ self::ACCESS_TOKEN ] ) ) {
+            $input[ self::ACCESS_TOKEN ] = sanitize_text_field( $input[ self::ACCESS_TOKEN ] );
+        }
+
+        if ( isset( $input[ self::APP_URL ] ) ) {
+            $input[ self::APP_URL ] = esc_url_raw( $input[ self::APP_URL ] );
+        }
+
+        if ( isset( $input[ self::BLOCK_PURCHASE ] ) ) {
+            $input[ self::BLOCK_PURCHASE ] = (int) $input[ self::BLOCK_PURCHASE ];
+        }
+
+        return $input;
     }
 
     /**

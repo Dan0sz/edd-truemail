@@ -1,6 +1,6 @@
 <?php
 /**
- * Truemail for Easy Digital Downloads
+ * Correct Contact - Email validation for WordPress
  *
  * @package   daandev/correct-contact
  * @author    Daan van den Bergh
@@ -11,6 +11,7 @@
 namespace CorrectContact;
 
 use CorrectContact\Admin\Settings;
+use CorrectContact\Options;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -29,8 +30,8 @@ class Client {
 	 * Client constructor.
 	 */
 	public function __construct() {
-		$this->token   = get_option( Settings::ACCESS_TOKEN );
-		$this->api_url = get_option( Settings::APP_URL );
+		$this->token   = Options::get( Settings::ACCESS_TOKEN );
+		$this->api_url = Options::get( Settings::APP_URL );
 	}
 	
 	/**

@@ -1,6 +1,6 @@
 <?php
 /**
- * Truemail for Easy Digital Downloads
+ * Correct Contact - Email validation for WordPress
  *
  * @package   daandev/correct-contact
  * @author    Daan van den Bergh

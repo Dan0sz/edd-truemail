@@ -12,6 +12,7 @@ namespace CorrectContact;
 
 use CorrectContact\Admin\Settings;
 use CorrectContact\Ajax;
+use CorrectContact\Options;
 use WpOrg\Requests\Exception\InvalidArgument;
 
 defined( 'ABSPATH' ) || exit;
@@ -28,7 +29,7 @@ abstract class Compatibility {
 	 * @throws InvalidArgument
 	 */
 	public function validate_email( $valid_data, $data ) {
-		if ( empty( get_option( Settings::BLOCK_PURCHASE ) ) ) {
+		if ( empty( Options::get( Settings::BLOCK_PURCHASE ) ) ) {
 			return;
 		}
 		
