@@ -2,15 +2,15 @@
 /**
  * Truemail for Easy Digital Downloads
  *
- * @package   daandev/edd-truemail
+ * @package   daandev/correct-contact
  * @author    Daan van den Bergh
  *            https://daan.dev
  * @copyright © 2023 Daan van den Bergh
  */
 
-namespace EDD\Truemail;
+namespace CorrectContact;
 
-use EDD\Truemail\Admin\Settings;
+use CorrectContact\Admin\Settings;
 use WpOrg\Requests\Exception\InvalidArgument;
 
 defined( 'ABSPATH' ) || exit;
@@ -44,17 +44,19 @@ class Plugin {
 	 * @return void
 	 */
 	public function enqueue_scripts() {
-		if ( ! edd_is_checkout() ) {
-			return;
-		}
-		
 		$ext = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG === true ? '.min' : '';
 		
-		wp_enqueue_script( 'edd-truemail', plugin_dir_url( EDD_TM_PLUGIN_FILE ) . "assets/js/edd-truemail$ext.js", [
+		wp_enqueue_script( 'correct-contact', plugin_dir_url( CC_PLUGIN_FILE ) . "assets/js/correct-contact$ext.js", [
 			'wp-util',
-			'edd-ajax',
-		],                 filemtime( plugin_dir_path( EDD_TM_PLUGIN_FILE ) . 'assets/js/edd-truemail.js' ), false );
-		wp_enqueue_style( 'edd-truemail', plugin_dir_url( EDD_TM_PLUGIN_FILE ) . "assets/css/edd-truemail$ext.css", [], filemtime( plugin_dir_path( EDD_TM_PLUGIN_FILE ) . 'assets/css/edd-truemail.css' ) );
+		], filemtime( plugin_dir_path( CC_PLUGIN_FILE ) . 'assets/js/correct-contact.js' ), false );
+		wp_enqueue_style( 'correct-contact', plugin_dir_url( CC_PLUGIN_FILE ) . "assets/css/correct-contact$ext.css", [], filemtime( plugin_dir_path( CC_PLUGIN_FILE ) . 'assets/css/correct-contact.css' ) );
+		
+		$selectors = get_option( Settings::FIELD_SELECTORS, '#edd-email' );
+		
+		wp_localize_script( 'correct-contact', 'cc_ajax_obj', [
+			'ajax_url'  => admin_url( 'admin-ajax.php' ),
+			'selectors' => $selectors,
+		] );
 	}
 	
 	/**
@@ -70,7 +72,7 @@ class Plugin {
 	 * @throws InvalidArgument
 	 */
 	public function validate_email( $valid_data, $data ) {
-		if ( empty( edd_get_option( Settings::BLOCK_PURCHASE ) ) ) {
+		if ( empty( get_option( Settings::BLOCK_PURCHASE ) ) ) {
 			return;
 		}
 		
@@ -91,7 +93,7 @@ class Plugin {
 		}
 		
 		if ( ! $result['success'] ) {
-			edd_set_error( 'invalid_email', __( 'The email address you entered either contains a typo or it doesn\'t exist.', 'edd-truemail' ) );
+			edd_set_error( 'invalid_email', __( 'The email address you entered either contains a typo or it doesn\'t exist.', 'correct-contact' ) );
 		}
 	}
 }

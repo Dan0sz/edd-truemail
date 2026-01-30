@@ -2,15 +2,15 @@
 /**
  * Truemail for Easy Digital Downloads
  *
- * @package   daandev/edd-truemail
+ * @package   daandev/correct-contact
  * @author    Daan van den Bergh
  *            https://daan.dev
  * @copyright © 2023 Daan van den Bergh
  */
 
-namespace EDD\Truemail;
+namespace CorrectContact;
 
-use EDD\Truemail\Admin\Settings;
+use CorrectContact\Admin\Settings;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -29,8 +29,8 @@ class Client {
 	 * Client constructor.
 	 */
 	public function __construct() {
-		$this->token   = edd_get_option( Settings::ACCESS_TOKEN );
-		$this->api_url = edd_get_option( Settings::APP_URL );
+		$this->token   = get_option( Settings::ACCESS_TOKEN );
+		$this->api_url = get_option( Settings::APP_URL );
 	}
 	
 	/**

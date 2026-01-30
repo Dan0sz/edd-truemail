@@ -2,20 +2,20 @@
 /**
  * Truemail for Easy Digital Downloads
  *
- * @package   daandev/edd-truemail
+ * @package   daandev/correct-contact
  * @author    Daan van den Bergh
  *            https://daan.dev
  * @copyright © 2023 Daan van den Bergh
  */
 
-namespace EDD\Truemail;
+namespace CorrectContact;
 
 use WpOrg\Requests\Exception\InvalidArgument;
 
 defined( 'ABSPATH' ) || exit;
 
 class Ajax {
-	const TRANSIENT_LABEL = 'edd_truemail_valid_%s';
+	const TRANSIENT_LABEL = 'cc_valid_%s';
 	
 	/**
 	 * Ajax constructor.
@@ -32,8 +32,8 @@ class Ajax {
 	 * @return void
 	 */
 	private function init() {
-		add_action( 'wp_ajax_edd_truemail_verify_email', [ $this, 'verify' ] );
-		add_action( 'wp_ajax_nopriv_edd_truemail_verify_email', [ $this, 'verify' ] );
+		add_action( 'wp_ajax_cc_verify_email', [ $this, 'verify' ] );
+		add_action( 'wp_ajax_nopriv_cc_verify_email', [ $this, 'verify' ] );
 	}
 	
 	/**
@@ -53,19 +53,19 @@ class Ajax {
 		];
 		
 		if ( ! $result['success'] && $result['code'] === 200 ) {
-			$response['message'] = __( 'We couldn\'t verify your email address. Are you sure it\'s spelled correctly?', 'edd-truemail' );
+			$response['message'] = __( 'We couldn\'t verify your email address. Are you sure it\'s spelled correctly?', 'correct-contact' );
 		}
 		
 		if ( ! $result['success'] && $result['code'] === 400 ) {
-			$response['message'] = __( 'Please enter a valid email address.', 'edd-truemail' );
+			$response['message'] = __( 'Please enter a valid email address.', 'correct-contact' );
 		}
 		
 		if ( ! $result['success'] && $result['code'] === 408 ) {
-			$response['message'] = __( 'Request timed out.', 'edd-truemail' );
+			$response['message'] = __( 'Request timed out.', 'correct-contact' );
 		}
 		
 		if ( $result['success'] && $result['code'] === 200 ) {
-			$response['message'] = __( 'Email address verified.', 'edd-truemail' );
+			$response['message'] = __( 'Email address verified.', 'correct-contact' );
 			$response['success'] = true;
 		}
 		

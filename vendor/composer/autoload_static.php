@@ -7,22 +7,14 @@ namespace Composer\Autoload;
 class ComposerStaticInit6fb779b3fefaa0738891d888702c96b1
 {
     public static $prefixLengthsPsr4 = array (
-        'P' => 
+        'C' =>
         array (
-            'PHPCSStandards\\Composer\\Plugin\\Installers\\PHPCodeSniffer\\' => 57,
-        ),
-        'E' => 
-        array (
-            'EDD\\Truemail\\' => 13,
+            'CorrectContact\\' => 15,
         ),
     );
 
     public static $prefixDirsPsr4 = array (
-        'PHPCSStandards\\Composer\\Plugin\\Installers\\PHPCodeSniffer\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/dealerdirect/phpcodesniffer-composer-installer/src',
-        ),
-        'EDD\\Truemail\\' => 
+        'CorrectContact\\' =>
         array (
             0 => __DIR__ . '/../..' . '/src',
         ),

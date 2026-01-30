@@ -1,8 +1,8 @@
 {
-    "name": "daandev/edd-truemail",
+  "name": "daandev/correct-contact",
     "autoload": {
         "psr-4": {
-            "EDD\\Truemail\\": "src/"
+          "CorrectContact\\": "src/"
         }
     },
     "authors": [
