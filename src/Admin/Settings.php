@@ -8,7 +8,7 @@
  * @copyright © 2023 Daan van den Bergh
  */
 
-namespace CorrectContact\Admin;
+namespace CorrectContacts\Admin;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -21,13 +21,30 @@ class Settings {
 
     const FIELD_SELECTORS = 'cc_field_selectors';
 
+    const SETTINGS_FIELD_GENERAL = 'cc-general-settings';
+
+    const SETTINGS_FIELD_ADVANCED = 'cc-advanced-settings';
+
+    /** @var string */
+    private $active_tab = '';
+
     /**
      * Settings constructor.
      */
 	public function __construct() {
+        $this->active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( $_GET['tab'] ) : self::SETTINGS_FIELD_GENERAL;
+
         add_action( 'admin_menu', [ $this, 'add_menu' ] );
         add_action( 'admin_init', [ $this, 'register_settings' ] );
         add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
+
+        // Tabs
+        add_action( 'cc_settings_tab', [ $this, 'general_settings_tab' ], 1 );
+        add_action( 'cc_settings_tab', [ $this, 'advanced_settings_tab' ], 2 );
+
+        // Content
+        add_action( 'cc_settings_content', [ $this, 'general_settings_content' ], 1 );
+        add_action( 'cc_settings_content', [ $this, 'advanced_settings_content' ], 2 );
 	}
 
     /**
@@ -47,64 +64,82 @@ class Settings {
      * Register settings.
 	 */
     public function register_settings() {
-        register_setting( 'correct-contacts', self::ACCESS_TOKEN );
-        register_setting( 'correct-contacts', self::APP_URL );
-        register_setting( 'correct-contacts', self::BLOCK_PURCHASE );
-        register_setting( 'correct-contacts', self::FIELD_SELECTORS, [
-                'sanitize_callback' => [ $this, 'sanitize_selectors' ],
-        ] );
+        $settings_config = [
+                self::SETTINGS_FIELD_GENERAL  => [
+                        'section_id'    => 'cc_general_section',
+                        'section_title' => __( 'General Settings', 'correct-contacts' ),
+                        'settings'      => [
+                                self::FIELD_SELECTORS => [
+                                        'label'             => __( 'Fields to Validate', 'correct-contacts' ),
+                                        'callback'          => [ $this, 'render_selectors_field' ],
+                                        'desc'              => __( 'Add the CSS selectors (classes or IDs) of the email fields you want to validate. Press enter after each entry.', 'correct-contacts' ),
+                                        'sanitize_callback' => [ $this, 'sanitize_selectors' ],
+                                ],
+                                self::BLOCK_PURCHASE  => [
+                                        'label'             => __( 'Prevent Purchase on Failure', 'correct-contacts' ),
+                                        'callback'          => [ $this, 'render_checkbox_field' ],
+                                        'desc'              => __( 'If enabled, the user won\'t be able to finalize the purchase in WooCommerce and Easy Digital Downloads if the email address fails to validate. Fails silently on a request timeout.', 'correct-contacts' ),
+                                        'sanitize_callback' => null,
+                                ],
+                        ],
+                ],
+                self::SETTINGS_FIELD_ADVANCED => [
+                        'section_id'    => 'cc_advanced_section',
+                        'section_title' => __( 'Advanced Settings', 'correct-contacts' ),
+                        'settings'      => [
+                                self::ACCESS_TOKEN => [
+                                        'label'             => __( 'Access Token', 'correct-contacts' ),
+                                        'callback'          => [ $this, 'render_text_field' ],
+                                        'desc'              => __( 'Enter the Access Token (environment variable) you\'ve configured in your Truemail instance here.', 'correct-contacts' ),
+                                        'sanitize_callback' => null,
+                                ],
+                                self::APP_URL      => [
+                                        'label'             => __( 'Application URL', 'correct-contacts' ),
+                                        'callback'          => [ $this, 'render_text_field' ],
+                                        'desc'              => __( 'Enter the URL of your Truemail instance here.', 'correct-contacts' ),
+                                        'sanitize_callback' => null,
+                                ],
+                        ],
+                ],
+        ];
 
-        add_settings_section(
-                'cc_general_section',
-                __( 'General Settings', 'correct-contacts' ),
+        // Register all settings
+        foreach ( $settings_config as $tab => $config ) {
+            foreach ( $config['settings'] as $setting_id => $setting ) {
+                $args = [];
+                if ( $setting['sanitize_callback'] ) {
+                    $args['sanitize_callback'] = $setting['sanitize_callback'];
+                }
+                register_setting( $tab, $setting_id, $args );
+            }
+        }
+
+        // Add sections and fields for active tab
+        if ( isset( $settings_config[ $this->active_tab ] ) ) {
+            $config = $settings_config[ $this->active_tab ];
+
+            add_settings_section(
+                    $config['section_id'],
+                    $config['section_title'],
                 null,
-                'correct-contacts'
-        );
+                    $this->active_tab
+            );
 
-        add_settings_field(
-                self::ACCESS_TOKEN,
-                __( 'Access Token', 'correct-contacts' ),
-                [ $this, 'render_text_field' ],
-                'correct-contacts',
-                'cc_general_section',
-                [ 'id'   => self::ACCESS_TOKEN,
-                  'desc' => __( 'Enter the Access Token (environment variable) you\'ve configured in your Truemail instance here.', 'correct-contacts' )
-                ]
-        );
-
-        add_settings_field(
-                self::APP_URL,
-                __( 'Application URL', 'correct-contacts' ),
-                [ $this, 'render_text_field' ],
-                'correct-contacts',
-                'cc_general_section',
-                [ 'id'   => self::APP_URL,
-                  'desc' => __( 'Enter the URL of your Truemail instance here.', 'correct-contacts' )
-                ]
-        );
-
-        add_settings_field(
-                self::BLOCK_PURCHASE,
-                __( 'Prevent Purchase on Failure', 'correct-contacts' ),
-                [ $this, 'render_checkbox_field' ],
-                'correct-contacts',
-                'cc_general_section',
-                [ 'id'   => self::BLOCK_PURCHASE,
-                  'desc' => __( 'If enabled, the user won\'t be able to finalize the purchase if the email address fails to validate. Fails silently on a request timeout.', 'correct-contacts' )
-                ]
-        );
-
-        add_settings_field(
-                self::FIELD_SELECTORS,
-                __( 'Fields to Validate', 'correct-contacts' ),
-                [ $this, 'render_selectors_field' ],
-                'correct-contacts',
-                'cc_general_section',
-                [ 'id'   => self::FIELD_SELECTORS,
-                  'desc' => __( 'Add the CSS selectors (classes or IDs) of the email fields you want to validate. Press enter after each entry.', 'correct-contacts' )
-                ]
-        );
-	}
+            foreach ( $config['settings'] as $setting_id => $setting ) {
+                add_settings_field(
+                        $setting_id,
+                        $setting['label'],
+                        $setting['callback'],
+                        $this->active_tab,
+                        $config['section_id'],
+                        [
+                                'id'   => $setting_id,
+                                'desc' => $setting['desc'],
+                        ]
+                );
+            }
+        }
+    }
 
     /**
      * Enqueue Select2 and admin styles for the settings page.
@@ -146,8 +181,10 @@ class Settings {
      */
     public function render_checkbox_field( $args ) {
         $value = get_option( $args['id'] );
+        echo '<label for="' . esc_attr( $args['id'] ) . '">';
         echo '<input type="checkbox" id="' . esc_attr( $args['id'] ) . '" name="' . esc_attr( $args['id'] ) . '" value="1" ' . checked( 1, $value, false ) . '>';
-        echo '<p class="description">' . esc_html( $args['desc'] ) . '</p>';
+        echo esc_html( $args['desc'] );
+        echo '</label>';
     }
 
     /**
@@ -185,16 +222,92 @@ class Settings {
         ?>
         <div class="wrap cc-admin">
             <h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
-            <form action="options.php" method="post">
-                <div class="cc-settings-container">
-                    <?php
-                    settings_fields( 'correct-contacts' );
-                    do_settings_sections( 'correct-contacts' );
-                    ?>
-                </div>
-                <?php submit_button(); ?>
-            </form>
+            <div class="settings-column">
+                <h2 class="cc-nav nav-tab-wrapper">
+                    <?php do_action( 'cc_settings_tab' ); ?>
+                </h2>
+                <?php do_action( 'cc_settings_content' ); ?>
+            </div>
         </div>
         <?php
-	}
+    }
+
+    /**
+     * Generate a tab.
+     *
+     * @param string $id
+     * @param string $icon
+     * @param string $label
+     */
+    private function generate_tab( $id, $icon, $label ) {
+        $active = $this->active_tab === $id ? 'nav-tab-active' : '';
+        ?>
+        <a class="nav-tab dashicons-before <?php echo esc_attr( $icon ); ?> <?php echo esc_attr( $active ); ?>"
+           href="<?php echo esc_url( admin_url( 'options-general.php?page=correct-contacts&tab=' . $id ) ); ?>">
+            <?php echo esc_html( $label ); ?>
+        </a>
+        <?php
+    }
+
+    /**
+     * General Settings tab.
+     */
+    public function general_settings_tab() {
+        $this->generate_tab(
+                self::SETTINGS_FIELD_GENERAL,
+                'dashicons-admin-settings',
+                __( 'General', 'correct-contacts' )
+        );
+    }
+
+    /**
+     * Advanced Settings tab.
+     */
+    public function advanced_settings_tab() {
+        $this->generate_tab(
+                self::SETTINGS_FIELD_ADVANCED,
+                'dashicons-admin-generic',
+                __( 'Advanced', 'correct-contacts' )
+        );
+    }
+
+    /**
+     * General Settings content.
+     */
+    public function general_settings_content() {
+        if ( $this->active_tab !== self::SETTINGS_FIELD_GENERAL ) {
+            return;
+        }
+        ?>
+        <form action="options.php" method="post">
+            <div class="cc-settings-container">
+                <?php
+                settings_fields( self::SETTINGS_FIELD_GENERAL );
+                do_settings_sections( self::SETTINGS_FIELD_GENERAL );
+                ?>
+            </div>
+            <?php submit_button(); ?>
+        </form>
+        <?php
+    }
+
+    /**
+     * Advanced Settings content.
+     */
+    public function advanced_settings_content() {
+        if ( $this->active_tab !== self::SETTINGS_FIELD_ADVANCED ) {
+            return;
+        }
+        ?>
+        <form action="options.php" method="post">
+            <div class="cc-settings-container">
+                <?php
+                settings_fields( self::SETTINGS_FIELD_ADVANCED );
+                do_settings_sections( self::SETTINGS_FIELD_ADVANCED );
+                ?>
+            </div>
+            <?php submit_button(); ?>
+        </form>
+        <?php
+    }
 }

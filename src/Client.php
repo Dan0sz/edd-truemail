@@ -8,9 +8,9 @@
  * @copyright © 2023 Daan van den Bergh
  */
 
-namespace CorrectContact;
+namespace CorrectContacts;
 
-use CorrectContact\Admin\Settings;
+use CorrectContacts\Admin\Settings;
 
 defined( 'ABSPATH' ) || exit;
 

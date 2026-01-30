@@ -30,6 +30,6 @@ require_once CC_PLUGIN_DIR . 'vendor/autoload.php';
 /**
  * All systems GO!!!
  *
- * @var \CorrectContact\Plugin $cc_basic
+ * @var \CorrectContacts\Plugin $cc_basic
  */
-$cc_basic = new CorrectContact\Plugin();
+$cc_basic = new CorrectContacts\Plugin();

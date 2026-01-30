@@ -2,7 +2,7 @@
   "name": "daandev/correct-contacts",
     "autoload": {
         "psr-4": {
-          "CorrectContact\\": "src/"
+          "CorrectContacts\\": "src/"
         }
     },
     "authors": [

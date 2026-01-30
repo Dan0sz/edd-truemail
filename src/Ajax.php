@@ -8,7 +8,7 @@
  * @copyright © 2023 Daan van den Bergh
  */
 
-namespace CorrectContact;
+namespace CorrectContacts;
 
 use WpOrg\Requests\Exception\InvalidArgument;
 

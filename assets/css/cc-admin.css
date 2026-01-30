@@ -57,12 +57,43 @@
 }
 
 /**
+ * Navigation
+ */
+.cc-admin h2.cc-nav {
+    border-bottom: 0;
+    padding-bottom: 3px;
+}
+
+.cc-admin h2.cc-nav a {
+    border: 0;
+    background-color: transparent;
+    font-weight: 600;
+}
+
+.cc-admin h2.cc-nav .nav-tab {
+    color: #000;
+}
+
+.cc-admin h2.cc-nav .nav-tab-active {
+    color: #00adda;
+}
+
+.cc-admin h2.cc-nav .nav-tab:hover {
+    color: #00adda;
+}
+
+.cc-admin .cc-nav .dashicons-before:before {
+    margin-right: 0.25em;
+    line-height: 1.15em;
+}
+
+/**
  * Settings Container
  */
 .cc-settings-container {
 	background-color: #fff;
 	padding: 5px 25px 50px;
-	margin: 2.5em auto 2em;
+    margin: 0 auto 2em;
 	overflow: visible;
 	border: 0;
 	border-top: 4px solid #00adda;
@@ -106,7 +137,7 @@
     margin-bottom: 1px;
 }
 
-.cc-admin input[type="checkbox"] + p.description {
+.cc-admin input[type="checkbox"] + label {
     display: inline;
     margin-left: 5px;
 }
