@@ -75,7 +75,7 @@
 }
 
 .cc-settings-container .form-table tr td {
-	padding: 20px 0;
+    padding: 15px 0;
 }
 
 .cc-settings-container p,
@@ -102,6 +102,15 @@
 	max-width: 500px;
 }
 
+.cc-admin input[type="checkbox"] {
+    margin-bottom: 1px;
+}
+
+.cc-admin input[type="checkbox"] + p.description {
+    display: inline;
+    margin-left: 5px;
+}
+
 /**
  * Select2 Customization
  */
@@ -120,16 +129,16 @@
 }
 
 .cc-admin .select2-container--default .select2-selection--multiple .select2-selection__choice {
-	background-color: #00adda;
+    background-color: #ebfdff;
 	border-color: #0099cc;
-	color: #fff;
+    color: #00adda;
 	border-radius: 5px;
-    padding: 3px 0 2px 15px;
-    margin-top: 3px;
+    padding: 3px 5px 2px 18px;
+    margin: 3px 0 0 2px;
 }
 
 .cc-admin .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
-	color: #fff;
+    color: #00adda;
     margin-right: 8px;
     padding: 4px 5px;
     border-right: none;
@@ -137,6 +146,7 @@
 
 .cc-admin .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover {
 	color: #fff;
+    background-color: #00adda;
 }
 
 /**
