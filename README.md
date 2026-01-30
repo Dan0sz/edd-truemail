@@ -1,4 +1,4 @@
-# CorrectContact for WordPress
+# Correct Contacts for WordPress
 
 This plugin adds email address validation to any field in any WordPress form.
 
@@ -14,7 +14,7 @@ Download the plugin and install it via the WordPress admin area.
 
 ## Configuration
 
-This plugin's options are available under Settings > Correct Contact:
+This plugin's options are available under Settings > Correct Contacts:
 
 1. Enter your Access Token,
 2. The public URL of your TrueMail instance,

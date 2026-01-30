@@ -2,7 +2,7 @@
 /**
  * Truemail for Easy Digital Downloads
  *
- * @package   daandev/correct-contact
+ * @package   daandev/correct-contacts
  * @author    Daan van den Bergh
  *            https://daan.dev
  * @copyright © 2023 Daan van den Bergh
@@ -46,14 +46,14 @@ class Plugin {
 	public function enqueue_scripts() {
 		$ext = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG === true ? '.min' : '';
 		
-		wp_enqueue_script( 'correct-contact', plugin_dir_url( CC_PLUGIN_FILE ) . "assets/js/correct-contact$ext.js", [
+		wp_enqueue_script( 'correct-contacts', plugin_dir_url( CC_PLUGIN_FILE ) . "assets/js/correct-contacts$ext.js", [
 			'wp-util',
-		], filemtime( plugin_dir_path( CC_PLUGIN_FILE ) . 'assets/js/correct-contact.js' ), false );
-		wp_enqueue_style( 'correct-contact', plugin_dir_url( CC_PLUGIN_FILE ) . "assets/css/correct-contact$ext.css", [], filemtime( plugin_dir_path( CC_PLUGIN_FILE ) . 'assets/css/correct-contact.css' ) );
+		], filemtime( plugin_dir_path( CC_PLUGIN_FILE ) . 'assets/js/correct-contacts.js' ), false );
+		wp_enqueue_style( 'correct-contacts', plugin_dir_url( CC_PLUGIN_FILE ) . "assets/css/correct-contacts$ext.css", [], filemtime( plugin_dir_path( CC_PLUGIN_FILE ) . 'assets/css/correct-contacts.css' ) );
 		
 		$selectors = get_option( Settings::FIELD_SELECTORS, '#edd-email' );
 		
-		wp_localize_script( 'correct-contact', 'cc_ajax_obj', [
+		wp_localize_script( 'correct-contacts', 'cc_ajax_obj', [
 			'ajax_url'  => admin_url( 'admin-ajax.php' ),
 			'selectors' => $selectors,
 		] );
@@ -93,7 +93,7 @@ class Plugin {
 		}
 		
 		if ( ! $result['success'] ) {
-			edd_set_error( 'invalid_email', __( 'The email address you entered either contains a typo or it doesn\'t exist.', 'correct-contact' ) );
+			edd_set_error( 'invalid_email', __( 'The email address you entered either contains a typo or it doesn\'t exist.', 'correct-contacts' ) );
 		}
 	}
 }

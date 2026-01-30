@@ -2,7 +2,7 @@
 /**
  * Truemail for Easy Digital Downloads
  *
- * @package   daandev/correct-contact
+ * @package   daandev/correct-contacts
  * @author    Daan van den Bergh
  *            https://daan.dev
  * @copyright © 2023 Daan van den Bergh
@@ -35,10 +35,10 @@ class Settings {
      */
     public function add_menu() {
         add_options_page(
-                __( 'Correct Contact Settings', 'correct-contact' ),
-                __( 'Correct Contact', 'correct-contact' ),
+                __( 'Correct Contacts', 'correct-contacts' ),
+                __( 'Correct Contacts', 'correct-contacts' ),
                 'manage_options',
-                'correct-contact',
+                'correct-contacts',
                 [ $this, 'render_settings_page' ]
         );
 	}
@@ -47,61 +47,61 @@ class Settings {
      * Register settings.
 	 */
     public function register_settings() {
-        register_setting( 'correct-contact', self::ACCESS_TOKEN );
-        register_setting( 'correct-contact', self::APP_URL );
-        register_setting( 'correct-contact', self::BLOCK_PURCHASE );
-        register_setting( 'correct-contact', self::FIELD_SELECTORS, [
+        register_setting( 'correct-contacts', self::ACCESS_TOKEN );
+        register_setting( 'correct-contacts', self::APP_URL );
+        register_setting( 'correct-contacts', self::BLOCK_PURCHASE );
+        register_setting( 'correct-contacts', self::FIELD_SELECTORS, [
                 'sanitize_callback' => [ $this, 'sanitize_selectors' ],
         ] );
 
         add_settings_section(
                 'cc_general_section',
-                __( 'General Settings', 'correct-contact' ),
+                __( 'General Settings', 'correct-contacts' ),
                 null,
-                'correct-contact'
+                'correct-contacts'
         );
 
         add_settings_field(
                 self::ACCESS_TOKEN,
-                __( 'Access Token', 'correct-contact' ),
+                __( 'Access Token', 'correct-contacts' ),
                 [ $this, 'render_text_field' ],
-                'correct-contact',
+                'correct-contacts',
                 'cc_general_section',
                 [ 'id'   => self::ACCESS_TOKEN,
-                  'desc' => __( 'Enter the Access Token (environment variable) you\'ve configured in your Truemail instance here.', 'correct-contact' )
+                  'desc' => __( 'Enter the Access Token (environment variable) you\'ve configured in your Truemail instance here.', 'correct-contacts' )
                 ]
         );
 
         add_settings_field(
                 self::APP_URL,
-                __( 'Application URL', 'correct-contact' ),
+                __( 'Application URL', 'correct-contacts' ),
                 [ $this, 'render_text_field' ],
-                'correct-contact',
+                'correct-contacts',
                 'cc_general_section',
                 [ 'id'   => self::APP_URL,
-                  'desc' => __( 'Enter the URL of your Truemail instance here.', 'correct-contact' )
+                  'desc' => __( 'Enter the URL of your Truemail instance here.', 'correct-contacts' )
                 ]
         );
 
         add_settings_field(
                 self::BLOCK_PURCHASE,
-                __( 'Prevent Purchase on Failure', 'correct-contact' ),
+                __( 'Prevent Purchase on Failure', 'correct-contacts' ),
                 [ $this, 'render_checkbox_field' ],
-                'correct-contact',
+                'correct-contacts',
                 'cc_general_section',
                 [ 'id'   => self::BLOCK_PURCHASE,
-                  'desc' => __( 'If enabled, the user won\'t be able to finalize the purchase if the email address fails to validate. Fails silently on a request timeout.', 'correct-contact' )
+                  'desc' => __( 'If enabled, the user won\'t be able to finalize the purchase if the email address fails to validate. Fails silently on a request timeout.', 'correct-contacts' )
                 ]
         );
 
         add_settings_field(
                 self::FIELD_SELECTORS,
-                __( 'Field Selectors', 'correct-contact' ),
+                __( 'Field Selectors', 'correct-contacts' ),
                 [ $this, 'render_selectors_field' ],
-                'correct-contact',
+                'correct-contacts',
                 'cc_general_section',
                 [ 'id'   => self::FIELD_SELECTORS,
-                  'desc' => __( 'Add the CSS selectors (classes or IDs) of the email fields you want to validate. Press enter after each entry.', 'correct-contact' )
+                  'desc' => __( 'Add the CSS selectors (classes or IDs) of the email fields you want to validate. Press enter after each entry.', 'correct-contacts' )
                 ]
         );
 	}
@@ -110,7 +110,7 @@ class Settings {
      * Enqueue Select2 for the settings page.
      */
     public function enqueue_assets( $hook ) {
-        if ( $hook !== 'settings_page_correct-contact' ) {
+        if ( $hook !== 'settings_page_correct-contacts' ) {
             return;
         }
 
@@ -122,7 +122,7 @@ class Settings {
 				$('#cc_field_selectors').select2({
 					tags: true,
 					tokenSeparators: [',', ' '],
-					placeholder: '" . __( 'Add selectors...', 'correct-contact' ) . "'
+					placeholder: '" . __( 'Add selectors...', 'correct-contacts' ) . "'
 				});
 			});
 		" );
@@ -183,8 +183,8 @@ class Settings {
             <h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
             <form action="options.php" method="post">
                 <?php
-                settings_fields( 'correct-contact' );
-                do_settings_sections( 'correct-contact' );
+                settings_fields( 'correct-contacts' );
+                do_settings_sections( 'correct-contacts' );
                 submit_button();
                 ?>
             </form>

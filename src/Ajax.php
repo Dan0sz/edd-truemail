@@ -2,7 +2,7 @@
 /**
  * Truemail for Easy Digital Downloads
  *
- * @package   daandev/correct-contact
+ * @package   daandev/correct-contacts
  * @author    Daan van den Bergh
  *            https://daan.dev
  * @copyright © 2023 Daan van den Bergh
@@ -53,19 +53,19 @@ class Ajax {
 		];
 		
 		if ( ! $result['success'] && $result['code'] === 200 ) {
-			$response['message'] = __( 'We couldn\'t verify your email address. Are you sure it\'s spelled correctly?', 'correct-contact' );
+			$response['message'] = __( 'We couldn\'t verify your email address. Are you sure it\'s spelled correctly?', 'correct-contacts' );
 		}
 		
 		if ( ! $result['success'] && $result['code'] === 400 ) {
-			$response['message'] = __( 'Please enter a valid email address.', 'correct-contact' );
+			$response['message'] = __( 'Please enter a valid email address.', 'correct-contacts' );
 		}
 		
 		if ( ! $result['success'] && $result['code'] === 408 ) {
-			$response['message'] = __( 'Request timed out.', 'correct-contact' );
+			$response['message'] = __( 'Request timed out.', 'correct-contacts' );
 		}
 		
 		if ( $result['success'] && $result['code'] === 200 ) {
-			$response['message'] = __( 'Email address verified.', 'correct-contact' );
+			$response['message'] = __( 'Email address verified.', 'correct-contacts' );
 			$response['success'] = true;
 		}
 		

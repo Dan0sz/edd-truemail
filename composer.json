@@ -1,5 +1,5 @@
 {
-  "name": "daandev/correct-contact",
+  "name": "daandev/correct-contacts",
     "autoload": {
         "psr-4": {
           "CorrectContact\\": "src/"

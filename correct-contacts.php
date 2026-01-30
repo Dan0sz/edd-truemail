@@ -1,12 +1,12 @@
 <?php
 /**
- * Plugin Name: CorrectContact for WordPress
+ * Plugin Name: Correct Contacts for WordPress
  * Plugin URI: https://correct.contact
  * Description: This plugin adds email address validation to any field in any WordPress form
  * Version: 1.1.8
  * Author: Daan from Daan.dev
  * Author URI: https://daan.dev/about/
- * Text Domain: correct-contact
+ * Text Domain: correct-contacts
  */
 
 defined( 'ABSPATH' ) || exit;
