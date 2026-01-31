@@ -213,7 +213,7 @@
     padding-top: 20px;
 }
 
-.cc-wizard-actions .button {
+.cc-wizard-container .button {
     font-family: 'Poppins', Verdana, sans-serif;
     font-weight: 500;
     padding: 8px 20px;
@@ -221,31 +221,31 @@
     font-size: 14px;
 }
 
-.cc-wizard-actions .button-primary {
+.cc-wizard-container .button-primary {
     background: #00adda;
     border-color: #00adda;
     color: #fff;
 }
 
-.cc-wizard-actions .button-primary:hover {
+.cc-wizard-container .button-primary:hover {
     background: #0099cc;
     border-color: #0099cc;
 }
 
-.cc-wizard-actions .button-primary:disabled {
+.cc-wizard-container .button-primary:disabled {
     background: #c3c4c7;
     border-color: #c3c4c7;
     cursor: not-allowed;
 }
 
-.cc-wizard-actions .button-secondary {
+.cc-wizard-container .button-secondary {
     background: none;
     border: none;
     color: #00adda;
     box-shadow: none;
 }
 
-.cc-wizard-actions .button-secondary:hover {
+.cc-wizard-container .button-secondary:hover {
     background: none;
     border: none;
     color: #0099cc;

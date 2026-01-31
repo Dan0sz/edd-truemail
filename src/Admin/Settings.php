@@ -371,18 +371,19 @@ class Settings {
                 <!-- Slide 2: Create API token -->
                 <div class="cc-wizard-slide" data-slide="2" style="display: none;">
                     <h2><?php esc_html_e( 'Create a DigitalOcean API token', 'correct-contact' ); ?></h2>
-                    <p><?php esc_html_e( 'CorrectContact needs a DigitalOcean API token to automatically create the email validation app in your account.', 'correct-contact' ); ?></p>
-                    <p><?php esc_html_e( 'This token is used only during setup. You can revoke or remove this token after the setup is complete.', 'correct-contact' ); ?></p>
-                    <p><?php esc_html_e( 'Set it up as follows:', 'correct-contact' ); ?></p>
-                    <p><strong><?php esc_html_e( 'Token name', 'correct-contact' ); ?>: </strong><?php esc_html_e( 'Correct Contact', 'correct-contact' ); ?></p>
+                    <p><?php esc_html_e( 'CorrectContact needs a DigitalOcean API token to automatically create the email validation app for you.', 'correct-contact' ); ?></p>
+                    <p><?php esc_html_e( 'This token is used only during setup. You will be prompted to remove this token after the setup is complete.', 'correct-contact' ); ?></p>
+                    <h2><?php _e( 'Required Scopes/Permissions', 'correct-contact' ); ?></h2>
+                    <p><?php _e( 'Most of the token\'s settings can keep their default value. You only have to make sure the permissions (or <strong>custom scopes</strong>) are configured as follows:',
+                                'correct-contact'
+                        ); ?></p>
+                    <ul>
+                        <li><strong><?php esc_html_e( 'Token Name', 'correct-contact' ); ?>:</strong> <?php esc_html_e( 'Correct Contact', 'correct-contact' ); ?></li>
+                        <li><strong><?php esc_html_e( 'Droplet', 'correct-contact' ); ?>:</strong> <?php esc_html_e( 'create/read', 'correct-contact' ); ?></li>
+                        <li><strong><?php esc_html_e( 'Project', 'correct-contact' ); ?>:</strong> <?php esc_html_e( 'create/read', 'correct-contact' ); ?></li>
+                    </ul>
                     <p>
-                        <strong><?php esc_html_e( 'Custom scopes', 'correct-contact' ); ?></strong>: Droplet:
-                        create/read and Project: create/read.
-                    </p>
-                    <p><strong><?php _e( 'Generate Token', 'correct-contact' ); ?></strong></p>
-
-                    <p>
-                        <a href="https://cloud.digitalocean.com/account/api/tokens" target="_blank"
+                        <a href="https://cloud.digitalocean.com/account/api/tokens/new" target="_blank"
                            class="button button-secondary"><?php esc_html_e( 'Create API token', 'correct-contact' ); ?></a>
                     </p>
 
