@@ -29,6 +29,8 @@ class Settings {
 
     const DO_TOKEN = 'cc_do_token';
 
+    const REGION = 'cc_region';
+
     const SETTINGS_FIELD_GENERAL = 'cc-general-settings';
 
     const SETTINGS_FIELD_ADVANCED = 'cc-advanced-settings';
@@ -169,7 +171,7 @@ class Settings {
         // If setup is not completed, enqueue wizard assets
         if ( ! $this->is_setup_completed() ) {
             wp_enqueue_style( 'cc-wizard', plugin_dir_url( CC_PLUGIN_FILE ) . 'assets/css/cc-wizard.css', [], filemtime( plugin_dir_path( CC_PLUGIN_FILE ) . 'assets/css/cc-wizard.css' ) );
-            wp_enqueue_script( 'cc-wizard', plugin_dir_url( CC_PLUGIN_FILE ) . 'assets/js/cc-wizard.js', [ 'jquery' ], filemtime( plugin_dir_path( CC_PLUGIN_FILE ) . 'assets/js/cc-wizard.js' ), true );
+            wp_enqueue_script( 'cc-wizard', plugin_dir_url( CC_PLUGIN_FILE ) . 'assets/js/cc-wizard.js', [], filemtime( plugin_dir_path( CC_PLUGIN_FILE ) . 'assets/js/cc-wizard.js' ), true );
 
             wp_localize_script( 'cc-wizard', 'ccWizard', [
                     'ajaxUrl' => admin_url( 'admin-ajax.php' ),
@@ -181,15 +183,17 @@ class Settings {
 
         // Enqueue Select2
         wp_enqueue_style( 'select2', 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css' );
-        wp_enqueue_script( 'select2', 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js', [ 'jquery' ] );
+        wp_enqueue_script( 'select2', 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js' );
 
         wp_add_inline_script( 'select2', "
-			jQuery(document).ready(function($) {
-				$('#cc_field_selectors').select2({
-					tags: true,
-					tokenSeparators: [',', ' '],
-					placeholder: '" . __( 'Add selectors...', 'correct-contact' ) . "'
-				});
+			document.addEventListener('DOMContentLoaded', function() {
+                if (typeof jQuery !== 'undefined') {
+                    jQuery('#cc_field_selectors').select2({
+                        tags: true,
+                        tokenSeparators: [',', ' '],
+                        placeholder: '" . __( 'Add selectors...', 'correct-contact' ) . "'
+                    });
+                }
 			});
 		" );
     }
@@ -258,6 +262,10 @@ class Settings {
 
         if ( isset( $input[ self::DO_TOKEN ] ) ) {
             $input[ self::DO_TOKEN ] = sanitize_text_field( $input[ self::DO_TOKEN ] );
+        }
+
+        if ( isset( $input[ self::REGION ] ) ) {
+            $input[ self::REGION ] = sanitize_text_field( $input[ self::REGION ] );
         }
 
         if ( isset( $input[ self::BLOCK_PURCHASE ] ) ) {
@@ -424,34 +432,40 @@ class Settings {
                     <p><?php esc_html_e( 'CorrectContact does not charge for infrastructure and does not add any markup.', 'correct-contact' ); ?></p>
 
                     <div class="cc-wizard-provision-content">
+                        <p>
+                            <label for="cc-region"><?php esc_html_e( 'Select datacenter region:', 'correct-contact' ); ?></label><br>
+                            <select id="cc-region" class="regular-text">
+                                <option value=""><?php esc_html_e( 'Loading regions...', 'correct-contact' ); ?></option>
+                            </select>
+                        </p>
                         <div class="cc-wizard-actions">
                             <button type="button"
-                                    class="button button-primary cc-wizard-provision"><?php esc_html_e( 'Create app', 'correct-contact' ); ?></button>
+                                    class="button button-primary cc-wizard-provision"
+                                    disabled><?php esc_html_e( 'Create app', 'correct-contact' ); ?></button>
                         </div>
                         <p class="cc-wizard-footer"><?php esc_html_e( 'This will take 1–2 minutes', 'correct-contact' ); ?></p>
                     </div>
 
                     <div class="cc-wizard-provision-progress" style="display: none;">
-                        <div class="cc-progress-bar">
-                            <div class="cc-progress-fill"></div>
+                        <div class="cc-wizard-progress-bar">
+                            <div class="cc-wizard-progress-fill"></div>
                         </div>
-                        <ul class="cc-progress-steps">
-                            <li data-step="project"><?php esc_html_e( 'Creating project', 'correct-contact' ); ?></li>
-                            <li data-step="server"><?php esc_html_e( 'Creating server', 'correct-contact' ); ?></li>
-                            <li data-step="install"><?php esc_html_e( 'Installing Truemail', 'correct-contact' ); ?></li>
-                            <li data-step="secure"><?php esc_html_e( 'Securing API access', 'correct-contact' ); ?></li>
-                            <li data-step="done"><?php esc_html_e( 'Done!', 'correct-contact' ); ?></li>
-                        </ul>
-                    </div>
-
-                    <div class="cc-wizard-provision-error" style="display: none;">
-                        <div class="cc-callout cc-callout-error">
-                            <p class="cc-error-message"></p>
-                            <div class="cc-wizard-actions">
-                                <a href="https://cloud.digitalocean.com/account/billing" target="_blank"
-                                   class="button button-secondary cc-add-payment"><?php esc_html_e( 'Add payment method', 'correct-contact' ); ?></a>
-                                <button type="button"
-                                        class="button button-primary cc-wizard-retry"><?php esc_html_e( 'Retry setup', 'correct-contact' ); ?></button>
+                        <div class="cc-wizard-progress-status">
+                            <ul class="cc-wizard-progress-steps">
+                                <li data-step="project"><?php esc_html_e( 'Creating project', 'correct-contact' ); ?></li>
+                                <li data-step="server"><?php esc_html_e( 'Creating app', 'correct-contact' ); ?></li>
+                                <li data-step="install"><?php esc_html_e( 'Deploying Truemail', 'correct-contact' ); ?></li>
+                                <li data-step="secure"><?php esc_html_e( 'Finalizing configuration', 'correct-contact' ); ?></li>
+                                <li data-step="done"><?php esc_html_e( 'Done!', 'correct-contact' ); ?></li>
+                            </ul>
+                            <p class="cc-error-message" style="display: none;"></p>
+                            <div class="cc-wizard-provision-error-actions" style="display: none;">
+                                <div class="cc-wizard-actions">
+                                    <a href="https://cloud.digitalocean.com/account/billing" target="_blank"
+                                       class="button button-secondary cc-add-payment"><?php esc_html_e( 'Add payment method', 'correct-contact' ); ?></a>
+                                    <button type="button"
+                                            class="button button-primary cc-wizard-retry"><?php esc_html_e( 'Retry setup', 'correct-contact' ); ?></button>
+                                </div>
                             </div>
                         </div>
                     </div>

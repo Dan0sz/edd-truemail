@@ -260,90 +260,77 @@
 }
 
 /* Progress Bar */
-.cc-wizard-progress {
+.cc-wizard-provision-progress {
+    position: relative;
     margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100px;
 }
 
 .cc-wizard-progress-bar {
     width: 100%;
-    height: 8px;
+    max-width: 400px;
+    height: 12px;
     background-color: #f0f0f1;
-    border-radius: 4px;
+    border-radius: 6px;
     overflow: hidden;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
 }
 
 .cc-wizard-progress-fill {
     height: 100%;
     background-color: #00adda;
     width: 0%;
-    transition: width 0.3s ease;
+    transition: width 0.3s ease, background-color 0.5s ease;
+}
+
+.cc-wizard-progress-fill.error {
+    background-color: #d63638 !important;
+}
+
+.cc-wizard-progress-fill.success {
+    background-color: #2ECC40 !important;
+}
+
+.cc-wizard-progress-status {
+    text-align: center;
+    width: 100%;
 }
 
 .cc-wizard-progress-steps {
     list-style: none;
     margin: 0;
     padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .cc-wizard-progress-steps li {
-    padding: 12px 0;
-    font-size: 15px;
-    color: #646970;
-    position: relative;
-    padding-left: 30px;
-}
-
-.cc-wizard-progress-steps li:before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 20px;
-    height: 20px;
-    border: 2px solid #c3c4c7;
-    border-radius: 50%;
-    background-color: #fff;
+    display: none;
+    font-size: 16px;
+    color: #1d2327;
+    font-weight: 500;
 }
 
 .cc-wizard-progress-steps li.active {
-    color: #00adda;
-    font-weight: 600;
+    display: block;
 }
 
-.cc-wizard-progress-steps li.active:before {
-    border-color: #00adda;
-    background-color: #00adda;
-    animation: pulse 1.5s infinite;
-}
-
-.cc-wizard-progress-steps li.complete {
-    color: #2ECC40;
-}
-
-.cc-wizard-progress-steps li.complete:before {
-    border-color: #2ECC40;
-    background-color: #2ECC40;
-    content: '✓';
-    color: #fff;
-    font-size: 12px;
-    line-height: 16px;
-    text-align: center;
-}
-
-.cc-wizard-progress-steps li.error {
+.cc-error-message {
     color: #d63638;
+    font-size: 14px;
+    margin: 10px 0;
+    font-weight: 500;
 }
 
-.cc-wizard-progress-steps li.error:before {
-    border-color: #d63638;
-    background-color: #d63638;
-    content: '✕';
-    color: #fff;
-    font-size: 12px;
-    line-height: 16px;
-    text-align: center;
+.cc-wizard-provision-content.faded {
+    opacity: 0.3;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
 }
 
 @keyframes pulse {

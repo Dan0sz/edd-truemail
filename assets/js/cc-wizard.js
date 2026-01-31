@@ -6,7 +6,7 @@
  * @copyright © 2023-2026 Daan van den Bergh
  */
 
-(function ($) {
+(function () {
     'use strict';
 
     const CCWizard = {
@@ -14,12 +14,22 @@
         doToken: '',
         appUrl: '',
         accessToken: '',
+        projectId: '',
+        appId: '',
 
         init: function () {
             this.bindEvents();
 
-            // Load saved DO token from input
-            this.doToken = $('#cc-do-token').val().trim();
+            const tokenInput = document.getElementById('cc-do-token');
+            if (tokenInput) {
+                // Load saved DO token from input
+                this.doToken = tokenInput.value.trim();
+
+                // If token is already present, validate it to enable the Continue button.
+                if (this.doToken) {
+                    this.validateToken();
+                }
+            }
 
             // Check for hash in URL and load that slide, otherwise start at slide 0
             const hash = window.location.hash;
@@ -33,55 +43,79 @@
             }
 
             this.showSlide(initialSlide);
-
-            // If token is already present, validate it to enable the Continue button.
-            if ($('#cc-do-token').val()) {
-                this.validateToken();
-            }
         },
 
         bindEvents: function () {
             // Navigation item clicks
-            $(document).on('click', '.cc-wizard-nav-item', this.handleNavClick.bind(this));
+            document.addEventListener('click', (e) => {
+                if (e.target.classList.contains('cc-wizard-nav-item')) {
+                    this.handleNavClick(e);
+                }
 
-            // Next button
-            $(document).on('click', '.cc-wizard-next', this.nextSlide.bind(this));
+                if (e.target.classList.contains('cc-wizard-next')) {
+                    this.nextSlide(e);
+                }
+
+                if (e.target.classList.contains('cc-wizard-provision')) {
+                    this.createApp(e);
+                }
+
+                if (e.target.classList.contains('cc-wizard-remove-token')) {
+                    this.removeToken(e);
+                }
+
+                if (e.target.classList.contains('cc-wizard-complete')) {
+                    this.completeWizard(e);
+                }
+
+                if (e.target.classList.contains('cc-wizard-retry')) {
+                    this.retryProvisioning(e);
+                }
+            });
 
             // Token input
-            $(document).on('input', '#cc-do-token', this.validateToken.bind(this));
-
-            // Create app button
-            $(document).on('click', '.cc-wizard-create-app', this.createApp.bind(this));
-
-            // Remove token button
-            $(document).on('click', '.cc-wizard-remove-token', this.removeToken.bind(this));
-
-            // Complete wizard button
-            $(document).on('click', '.cc-wizard-complete', this.completeWizard.bind(this));
+            const tokenInput = document.getElementById('cc-do-token');
+            if (tokenInput) {
+                tokenInput.addEventListener('input', this.validateToken.bind(this));
+            }
 
             // Handle browser back/forward navigation
-            $(window).on('hashchange', this.handleHashChange.bind(this));
+            window.addEventListener('hashchange', this.handleHashChange.bind(this));
         },
 
         handleNavClick: function (e) {
             e.preventDefault();
-            const $navItem = $(e.currentTarget);
-            const targetSlide = parseInt($navItem.data('slide'));
+            const navItem = e.target;
+            const targetSlide = parseInt(navItem.dataset.slide);
 
             // Don't allow clicking on disabled items
-            if ($navItem.hasClass('disabled')) {
+            if (navItem.classList.contains('disabled')) {
                 return;
             }
 
             // Only allow clicking on completed items or current item
-            if ($navItem.hasClass('completed') || $navItem.hasClass('nav-tab-active')) {
+            if (navItem.classList.contains('completed') || navItem.classList.contains('nav-tab-active')) {
                 this.showSlide(targetSlide);
             }
         },
 
         showSlide: function (slideNumber) {
-            $('.cc-wizard-slide').hide();
-            $('.cc-wizard-slide[data-slide="' + slideNumber + '"]').fadeIn(300);
+            const slides = document.querySelectorAll('.cc-wizard-slide');
+            slides.forEach(slide => {
+                slide.style.display = 'none';
+                slide.style.opacity = '0';
+            });
+
+            const targetSlide = document.querySelector(`.cc-wizard-slide[data-slide="${slideNumber}"]`);
+            if (targetSlide) {
+                targetSlide.style.display = 'block';
+                // Simple fade in effect
+                setTimeout(() => {
+                    targetSlide.style.transition = 'opacity 0.3s ease-in-out';
+                    targetSlide.style.opacity = '1';
+                }, 10);
+            }
+
             this.currentSlide = slideNumber;
 
             // Update URL hash
@@ -89,6 +123,52 @@
 
             // Update navigation states
             this.updateNavigationStates(slideNumber);
+
+            // Fetch regions if on Slide 3
+            if (slideNumber === 3) {
+                this.fetchRegions();
+            }
+        },
+
+        fetchRegions: function () {
+            const regionSelect = document.getElementById('cc-region');
+            const provisionButton = document.querySelector('.cc-wizard-provision');
+
+            if (!regionSelect || regionSelect.options.length > 1) {
+                return; // Already loaded or doesn't exist
+            }
+
+            const formData = new FormData();
+            formData.append('action', 'cc_wizard_fetch_regions');
+            formData.append('nonce', ccWizard.nonce);
+            formData.append('token', this.doToken);
+
+            fetch(ccWizard.ajaxUrl, {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(response => {
+                    if (response.success && response.data.regions) {
+                        regionSelect.innerHTML = '';
+                        response.data.regions.forEach(region => {
+                            const option = document.createElement('option');
+                            option.value = region.slug;
+                            option.textContent = region.name;
+                            regionSelect.appendChild(option);
+                        });
+                        if (provisionButton) {
+                            provisionButton.disabled = false;
+                        }
+                    } else {
+                        regionSelect.innerHTML = '<option value="">' + (response.data.message || 'Error loading regions') + '</option>';
+                    }
+                })
+                .catch(() => {
+                    if (regionSelect) {
+                        regionSelect.innerHTML = '<option value="">Error loading regions</option>';
+                    }
+                });
         },
 
         handleHashChange: function () {
@@ -99,34 +179,30 @@
                 if (!isNaN(slideNumber) && slideNumber >= 0 && slideNumber <= 4) {
                     // Only update if it's a different slide
                     if (slideNumber !== this.currentSlide) {
-                        $('.cc-wizard-slide').hide();
-                        $('.cc-wizard-slide[data-slide="' + slideNumber + '"]').fadeIn(300);
-                        this.currentSlide = slideNumber;
-                        this.updateNavigationStates(slideNumber);
+                        this.showSlide(slideNumber);
                     }
                 }
             }
         },
 
         updateNavigationStates: function (currentSlide) {
-            const $navItems = $('.cc-wizard-nav-item');
+            const navItems = document.querySelectorAll('.cc-wizard-nav-item');
 
-            $navItems.each(function () {
-                const $item = $(this);
-                const itemSlide = parseInt($item.data('slide'));
+            navItems.forEach(item => {
+                const itemSlide = parseInt(item.dataset.slide);
 
                 // Remove all state classes
-                $item.removeClass('nav-tab-active completed disabled');
+                item.classList.remove('nav-tab-active', 'completed', 'disabled');
 
                 if (itemSlide === currentSlide) {
                     // Current slide - active
-                    $item.addClass('nav-tab-active');
+                    item.classList.add('nav-tab-active');
                 } else if (itemSlide < currentSlide) {
                     // Previous slides - completed and clickable
-                    $item.addClass('completed');
+                    item.classList.add('completed');
                 } else {
                     // Future slides - disabled
-                    $item.addClass('disabled');
+                    item.classList.add('disabled');
                 }
             });
         },
@@ -143,54 +219,68 @@
         },
 
         validateToken: function () {
-            const token = $('#cc-do-token').val().trim();
-            const $button = $('.cc-wizard-slide[data-slide="2"] .cc-wizard-next');
+            const tokenInput = document.getElementById('cc-do-token');
+            const token = tokenInput ? tokenInput.value.trim() : '';
+            const button = document.querySelector('.cc-wizard-slide[data-slide="2"] .cc-wizard-next');
 
-            if (token.length > 20) {
-                $button.prop('disabled', false);
-            } else {
-                $button.prop('disabled', true);
+            if (button) {
+                button.disabled = token.length <= 20;
             }
         },
 
         saveDOToken: function () {
-            const token = $('#cc-do-token').val().trim();
+            const tokenInput = document.getElementById('cc-do-token');
+            const token = tokenInput ? tokenInput.value.trim() : '';
             this.doToken = token;
 
             if (token.length <= 20) {
                 return;
             }
 
-            $.ajax({
-                url: ccWizard.ajaxUrl,
-                type: 'POST',
-                data: {
-                    action: 'cc_wizard_save_do_token',
-                    nonce: ccWizard.nonce,
-                    token: token
-                },
-                success: function (response) {
+            const formData = new FormData();
+            formData.append('action', 'cc_wizard_save_do_token');
+            formData.append('nonce', ccWizard.nonce);
+            formData.append('token', token);
+
+            fetch(ccWizard.ajaxUrl, {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(response => {
                     if (response.success) {
                         console.log('DO token saved.');
                     }
-                }
-            });
+                });
         },
 
         createApp: function (e) {
             e.preventDefault();
 
-            const $button = $(e.currentTarget);
-            const $slide = $('.cc-wizard-slide[data-slide="3"]');
-            const $content = $slide.find('.cc-wizard-content-main');
-            const $progress = $slide.find('.cc-wizard-progress');
-            const $error = $slide.find('.cc-wizard-error');
+            const button = e.target;
+            const slide = document.querySelector('.cc-wizard-slide[data-slide="3"]');
+            const content = slide.querySelector('.cc-wizard-provision-content');
+            const progress = slide.querySelector('.cc-wizard-provision-progress');
 
-            // Hide button and content, show progress
-            $button.hide();
-            $content.fadeOut(200, function () {
-                $progress.fadeIn(300);
-            });
+            // Hide button
+            button.style.display = 'none';
+
+            // Fade content, show progress
+            if (content) {
+                content.style.transition = 'opacity 0.2s';
+                content.style.opacity = '0';
+                setTimeout(() => {
+                    content.style.display = 'none';
+                    if (progress) {
+                        progress.style.display = 'flex';
+                        progress.style.opacity = '0';
+                        setTimeout(() => {
+                            progress.style.transition = 'opacity 0.3s';
+                            progress.style.opacity = '1';
+                        }, 10);
+                    }
+                }, 200);
+            }
 
             // Start provisioning
             this.provisionServer();
@@ -198,33 +288,46 @@
 
         provisionServer: function () {
             const self = this;
-            let currentStep = 0;
             const steps = ['project', 'server', 'install', 'secure', 'done'];
 
-            function updateProgress(step) {
-                const $steps = $('.cc-wizard-progress-steps li');
-                const $progressFill = $('.cc-wizard-progress-fill');
-                const progress = ((step + 1) / steps.length) * 100;
+            const updateProgress = (stepIndex) => {
+                const stepElements = document.querySelectorAll('.cc-wizard-progress-steps li');
+                const progressFill = document.querySelector('.cc-wizard-progress-fill');
+                const progressPercentage = ((stepIndex + 1) / steps.length) * 100;
 
-                $steps.removeClass('active complete error');
-                $steps.eq(step).addClass('active');
-                $steps.slice(0, step).addClass('complete');
-                $progressFill.css('width', progress + '%');
-            }
+                stepElements.forEach((el, index) => {
+                    el.classList.remove('active', 'complete', 'error');
+                    if (index === stepIndex) {
+                        el.classList.add('active');
+                    } else if (index < stepIndex) {
+                        el.classList.add('complete');
+                    }
+                });
 
-            function processStep(step) {
-                updateProgress(step);
+                if (progressFill) {
+                    progressFill.style.width = progressPercentage + '%';
+                }
+            };
 
-                $.ajax({
-                    url: ccWizard.ajaxUrl,
-                    type: 'POST',
-                    data: {
-                        action: 'cc_wizard_provision',
-                        nonce: ccWizard.nonce,
-                        step: steps[step],
-                        token: self.doToken
-                    },
-                    success: function (response) {
+            const processStep = (stepIndex) => {
+                updateProgress(stepIndex);
+
+                const regionSelect = document.getElementById('cc-region');
+                const formData = new FormData();
+                formData.append('action', 'cc_wizard_provision');
+                formData.append('nonce', ccWizard.nonce);
+                formData.append('step', steps[stepIndex]);
+                formData.append('token', this.doToken);
+                formData.append('region', regionSelect ? regionSelect.value : 'ams3');
+                formData.append('project_id', this.projectId);
+                formData.append('app_id', this.appId);
+
+                fetch(ccWizard.ajaxUrl, {
+                    method: 'POST',
+                    body: formData
+                })
+                    .then(response => response.json())
+                    .then(response => {
                         if (response.success) {
                             // Store credentials if returned
                             if (response.data.app_url) {
@@ -233,83 +336,110 @@
                             if (response.data.access_token) {
                                 self.accessToken = response.data.access_token;
                             }
+                            if (response.data.project_id) {
+                                self.projectId = response.data.project_id;
+                            }
+                            if (response.data.app_id) {
+                                self.appId = response.data.app_id;
+                            }
 
                             // Move to next step or complete
-                            if (step < steps.length - 1) {
-                                setTimeout(function () {
-                                    processStep(step + 1);
+                            if (response.data.retry) {
+                                setTimeout(() => {
+                                    processStep(stepIndex);
+                                }, 2000);
+                            } else if (stepIndex < steps.length - 1) {
+                                setTimeout(() => {
+                                    processStep(stepIndex + 1);
                                 }, 500);
                             } else {
-                                // Provisioning complete
-                                setTimeout(function () {
+                                // Provisioning complete - turn bar green
+                                const progressFill = document.querySelector('.cc-wizard-progress-fill');
+                                if (progressFill) {
+                                    progressFill.classList.add('success');
+                                }
+                                setTimeout(() => {
                                     self.saveCredentials();
                                 }, 1000);
                             }
                         } else {
-                            self.handleProvisioningError(response.data, step);
+                            self.handleProvisioningError(response.data, stepIndex);
                         }
-                    },
-                    error: function (xhr, status, error) {
+                    })
+                    .catch(error => {
                         self.handleProvisioningError({
-                            message: 'Network error: ' + error,
+                            message: 'Network error: ' + error.message,
                             code: 'network_error'
-                        }, step);
-                    }
-                });
-            }
+                        }, stepIndex);
+                    });
+            };
 
             // Start with first step
             processStep(0);
         },
 
-        handleProvisioningError: function (error, step) {
-            const $slide = $('.cc-wizard-slide[data-slide="3"]');
-            const $progress = $slide.find('.cc-wizard-progress');
-            const $error = $slide.find('.cc-wizard-error');
-            const $errorMessage = $error.find('.cc-wizard-error-message');
-            const $errorActions = $error.find('.cc-wizard-error-actions');
+        handleProvisioningError: function (error, stepIndex) {
+            const slide = document.querySelector('.cc-wizard-slide[data-slide="3"]');
+            const errorMessage = slide.querySelector('.cc-error-message');
+            const errorActions = slide.querySelector('.cc-wizard-provision-error-actions');
+            const progressFill = slide.querySelector('.cc-wizard-progress-fill');
+            const addPaymentBtn = slide.querySelector('.cc-add-payment');
+            const stepsList = slide.querySelector('.cc-wizard-progress-steps');
 
             // Mark current step as error
-            $('.cc-wizard-progress-steps li').eq(step).addClass('error');
+            const stepElements = document.querySelectorAll('.cc-wizard-progress-steps li');
+            if (stepElements[stepIndex]) {
+                stepElements[stepIndex].classList.add('error');
+            }
 
-            // Hide progress, show error
-            $progress.fadeOut(200, function () {
-                $errorMessage.text(error.message || 'An error occurred during setup.');
+            // Turn progress bar red and full
+            if (progressFill) {
+                progressFill.style.width = '100%';
+                progressFill.classList.add('error');
+            }
 
-                // Handle specific error types
-                if (error.code === 'payment_method_required') {
-                    $errorActions.html(
-                        '<a href="https://cloud.digitalocean.com/account/billing" target="_blank" class="button">Add payment method</a>' +
-                        '<button type="button" class="button button-primary cc-wizard-retry">Retry setup</button>'
-                    );
-                } else {
-                    $errorActions.html(
-                        '<button type="button" class="button button-primary cc-wizard-retry">Retry setup</button>'
-                    );
-                }
+            // Show error message and actions
+            if (stepsList) {
+                stepsList.style.display = 'none';
+            }
 
-                $error.fadeIn(300);
-            });
+            if (errorMessage) {
+                errorMessage.textContent = error.message || 'An error occurred during setup.';
+                errorMessage.style.display = 'block';
+            }
 
-            // Bind retry button
-            $(document).on('click', '.cc-wizard-retry', this.retryProvisioning.bind(this));
+            if (addPaymentBtn) {
+                addPaymentBtn.style.display = (error.code === 'payment_method_required') ? 'inline-block' : 'none';
+            }
+
+            if (errorActions) {
+                errorActions.style.display = 'block';
+            }
         },
 
         retryProvisioning: function (e) {
             e.preventDefault();
 
-            const $slide = $('.cc-wizard-slide[data-slide="3"]');
-            const $error = $slide.find('.cc-wizard-error');
-            const $progress = $slide.find('.cc-wizard-progress');
+            const slide = document.querySelector('.cc-wizard-slide[data-slide="3"]');
+            const stepsList = slide.querySelector('.cc-wizard-progress-steps');
+            const errorMessage = slide.querySelector('.cc-error-message');
+            const errorActions = slide.querySelector('.cc-wizard-provision-error-actions');
+            const progressFill = slide.querySelector('.cc-wizard-progress-fill');
 
-            // Reset progress
-            $('.cc-wizard-progress-steps li').removeClass('active complete error');
-            $('.cc-wizard-progress-fill').css('width', '0%');
-
-            // Hide error, show progress
-            $error.fadeOut(200, function () {
-                $progress.fadeIn(300);
-            });
+            // Reset UI
+            if (progressFill) {
+                progressFill.style.width = '0%';
+                progressFill.classList.remove('error', 'success');
+            }
+            if (stepsList) {
+                stepsList.style.display = 'block';
+            }
+            if (errorMessage) {
+                errorMessage.style.display = 'none';
+            }
+            if (errorActions) {
+                errorActions.style.display = 'none';
+            }
 
             // Retry provisioning
             this.provisionServer();
@@ -318,94 +448,111 @@
         saveCredentials: function () {
             const self = this;
 
-            $.ajax({
-                url: ccWizard.ajaxUrl,
-                type: 'POST',
-                data: {
-                    action: 'cc_wizard_save_credentials',
-                    nonce: ccWizard.nonce,
-                    app_url: this.appUrl,
-                    access_token: this.accessToken,
-                    do_token: this.doToken
-                },
-                success: function (response) {
+            const formData = new FormData();
+            formData.append('action', 'cc_wizard_save_credentials');
+            formData.append('nonce', ccWizard.nonce);
+            formData.append('app_url', this.appUrl);
+            formData.append('access_token', this.accessToken);
+            formData.append('do_token', this.doToken);
+
+            fetch(ccWizard.ajaxUrl, {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(response => {
                     if (response.success) {
                         // Move to success slide
                         self.showSlide(4);
                     } else {
                         alert('Failed to save credentials. Please try again.');
                     }
-                },
-                error: function () {
+                })
+                .catch(() => {
                     alert('Failed to save credentials. Please try again.');
-                }
-            });
+                });
         },
 
         removeToken: function (e) {
             e.preventDefault();
 
-            const $button = $(e.currentTarget);
-            $button.prop('disabled', true).text('Removing...');
+            const button = e.target;
+            button.disabled = true;
+            const originalText = button.textContent;
+            button.textContent = 'Removing...';
 
-            $.ajax({
-                url: ccWizard.ajaxUrl,
-                type: 'POST',
-                data: {
-                    action: 'cc_wizard_remove_token',
-                    nonce: ccWizard.nonce
-                },
-                success: function (response) {
+            const formData = new FormData();
+            formData.append('action', 'cc_wizard_remove_token');
+            formData.append('nonce', ccWizard.nonce);
+
+            fetch(ccWizard.ajaxUrl, {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(response => {
                     if (response.success) {
-                        $button.text('Token removed').addClass('button-disabled');
-                        $('.cc-wizard-token-cleanup').fadeOut(300);
+                        button.textContent = 'Token removed';
+                        button.classList.add('button-disabled');
                     } else {
-                        $button.prop('disabled', false).text('Remove API token');
+                        button.disabled = false;
+                        button.textContent = originalText;
                         alert('Failed to remove token. Please try again.');
                     }
-                },
-                error: function () {
-                    $button.prop('disabled', false).text('Remove API token');
+                })
+                .catch(() => {
+                    button.disabled = false;
+                    button.textContent = originalText;
                     alert('Failed to remove token. Please try again.');
-                }
-            });
+                });
         },
 
         completeWizard: function (e) {
             e.preventDefault();
 
-            const $button = $(e.currentTarget);
-            $button.prop('disabled', true).text('Completing...');
+            const button = e.target;
+            button.disabled = true;
+            const originalText = button.textContent;
+            button.textContent = 'Completing...';
 
-            $.ajax({
-                url: ccWizard.ajaxUrl,
-                type: 'POST',
-                data: {
-                    action: 'cc_wizard_complete',
-                    nonce: ccWizard.nonce
-                },
-                success: function (response) {
+            const formData = new FormData();
+            formData.append('action', 'cc_wizard_complete');
+            formData.append('nonce', ccWizard.nonce);
+
+            fetch(ccWizard.ajaxUrl, {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(response => {
                     if (response.success) {
                         // Reload page to show settings
                         window.location.reload();
                     } else {
-                        $button.prop('disabled', false).text('Continue to settings');
+                        button.disabled = false;
+                        button.textContent = originalText;
                         alert('Failed to complete setup. Please try again.');
                     }
-                },
-                error: function () {
-                    $button.prop('disabled', false).text('Continue to settings');
+                })
+                .catch(() => {
+                    button.disabled = false;
+                    button.textContent = originalText;
                     alert('Failed to complete setup. Please try again.');
-                }
-            });
+                });
         }
     };
 
     // Initialize on document ready
-    $(document).ready(function () {
-        if ($('.cc-admin').length) {
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+            if (document.querySelector('.cc-admin')) {
+                CCWizard.init();
+            }
+        });
+    } else {
+        if (document.querySelector('.cc-admin')) {
             CCWizard.init();
         }
-    });
+    }
 
-})(jQuery);
+})();
