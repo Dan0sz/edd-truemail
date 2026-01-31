@@ -17,7 +17,19 @@
 
         init: function () {
             this.bindEvents();
-            this.showSlide(0);
+
+            // Check for hash in URL and load that slide, otherwise start at slide 0
+            const hash = window.location.hash;
+            let initialSlide = 0;
+
+            if (hash && hash.startsWith('#slide-')) {
+                const slideNumber = parseInt(hash.replace('#slide-', ''));
+                if (!isNaN(slideNumber) && slideNumber >= 0 && slideNumber <= 4) {
+                    initialSlide = slideNumber;
+                }
+            }
+
+            this.showSlide(initialSlide);
         },
 
         bindEvents: function () {
@@ -38,6 +50,9 @@
 
             // Complete wizard button
             $(document).on('click', '.cc-wizard-complete', this.completeWizard.bind(this));
+
+            // Handle browser back/forward navigation
+            $(window).on('hashchange', this.handleHashChange.bind(this));
         },
 
         handleNavClick: function (e) {
@@ -61,8 +76,28 @@
             $('.cc-wizard-slide[data-slide="' + slideNumber + '"]').fadeIn(300);
             this.currentSlide = slideNumber;
 
+            // Update URL hash
+            window.location.hash = 'slide-' + slideNumber;
+
             // Update navigation states
             this.updateNavigationStates(slideNumber);
+        },
+
+        handleHashChange: function () {
+            const hash = window.location.hash;
+
+            if (hash && hash.startsWith('#slide-')) {
+                const slideNumber = parseInt(hash.replace('#slide-', ''));
+                if (!isNaN(slideNumber) && slideNumber >= 0 && slideNumber <= 4) {
+                    // Only update if it's a different slide
+                    if (slideNumber !== this.currentSlide) {
+                        $('.cc-wizard-slide').hide();
+                        $('.cc-wizard-slide[data-slide="' + slideNumber + '"]').fadeIn(300);
+                        this.currentSlide = slideNumber;
+                        this.updateNavigationStates(slideNumber);
+                    }
+                }
+            }
         },
 
         updateNavigationStates: function (currentSlide) {
