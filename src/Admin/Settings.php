@@ -25,7 +25,9 @@ class Settings {
 
     const FIELD_SELECTORS = 'cc_field_selectors';
 
-    const SETTINGS_FIELD_GENERAL = 'cc-general-settings';
+	const SETUP_COMPLETED = 'cc_setup_completed';
+
+	const SETTINGS_FIELD_GENERAL = 'cc-general-settings';
 
     const SETTINGS_FIELD_ADVANCED = 'cc-advanced-settings';
 
@@ -38,7 +40,9 @@ class Settings {
     public function __construct() {
         $this->active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( $_GET['tab'] ) : self::SETTINGS_FIELD_GENERAL;
 
-        add_action( 'admin_menu', [ $this, 'add_menu' ] );
+	    new Wizard\Ajax();
+
+	    add_action( 'admin_menu', [ $this, 'add_menu' ] );
         add_action( 'admin_init', [ $this, 'register_settings' ] );
         add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
 

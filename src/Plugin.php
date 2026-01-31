@@ -23,6 +23,7 @@ class Plugin {
 	 * @return void
 	 */
 	public function __construct() {
+		new Admin\Notice();
 		new Admin\Settings();
 		new Ajax();
 		new Compatibility\EDD();
@@ -48,10 +49,10 @@ class Plugin {
 	public function enqueue_scripts() {
 		$ext = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG === true ? '.min' : '';
 		
-		wp_enqueue_script( 'correct-contact', plugin_dir_url( CC_PLUGIN_FILE ) . "assets/js/correct-contacts$ext.js", [
+		wp_enqueue_script( 'correct-contact', plugin_dir_url( CC_PLUGIN_FILE ) . "assets/js/correct-contact$ext.js", [
 			'wp-util',
 		], filemtime( plugin_dir_path( CC_PLUGIN_FILE ) . 'assets/js/correct-contact.js' ), false );
-		wp_enqueue_style( 'correct-contact', plugin_dir_url( CC_PLUGIN_FILE ) . "assets/css/correct-contacts$ext.css", [], filemtime( plugin_dir_path( CC_PLUGIN_FILE ) . 'assets/css/correct-contacts.css' ) );
+		wp_enqueue_style( 'correct-contact', plugin_dir_url( CC_PLUGIN_FILE ) . "assets/css/correct-contact$ext.css", [], filemtime( plugin_dir_path( CC_PLUGIN_FILE ) . 'assets/css/correct-contact.css' ) );
 		
 		$selectors = Options::get( Settings::FIELD_SELECTORS, '' );
 		
