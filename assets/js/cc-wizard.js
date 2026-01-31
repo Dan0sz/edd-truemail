@@ -18,6 +18,9 @@
         init: function () {
             this.bindEvents();
 
+            // Load saved DO token from input
+            this.doToken = $('#cc-do-token').val().trim();
+
             // Check for hash in URL and load that slide, otherwise start at slide 0
             const hash = window.location.hash;
             let initialSlide = 0;
@@ -30,6 +33,11 @@
             }
 
             this.showSlide(initialSlide);
+
+            // If token is already present, validate it to enable the Continue button.
+            if ($('#cc-do-token').val()) {
+                this.validateToken();
+            }
         },
 
         bindEvents: function () {
@@ -128,7 +136,7 @@
 
             // Save token if on slide 2
             if (this.currentSlide === 2) {
-                this.doToken = $('#cc-do-token').val().trim();
+                this.saveDOToken();
             }
 
             this.showSlide(this.currentSlide + 1);
@@ -143,6 +151,30 @@
             } else {
                 $button.prop('disabled', true);
             }
+        },
+
+        saveDOToken: function () {
+            const token = $('#cc-do-token').val().trim();
+            this.doToken = token;
+
+            if (token.length <= 20) {
+                return;
+            }
+
+            $.ajax({
+                url: ccWizard.ajaxUrl,
+                type: 'POST',
+                data: {
+                    action: 'cc_wizard_save_do_token',
+                    nonce: ccWizard.nonce,
+                    token: token
+                },
+                success: function (response) {
+                    if (response.success) {
+                        console.log('DO token saved.');
+                    }
+                }
+            });
         },
 
         createApp: function (e) {

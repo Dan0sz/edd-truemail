@@ -11,6 +11,7 @@
 namespace CorrectContact\Admin\Wizard;
 
 use CorrectContact\Admin\Settings;
+use CorrectContact\Options;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -19,10 +20,32 @@ class Ajax {
 	 * Ajax constructor.
 	 */
 	public function __construct() {
+		add_action( 'wp_ajax_cc_wizard_save_do_token', [ $this, 'ajax_wizard_save_do_token' ] );
 		add_action( 'wp_ajax_cc_wizard_provision', [ $this, 'ajax_wizard_provision' ] );
 		add_action( 'wp_ajax_cc_wizard_save_credentials', [ $this, 'ajax_wizard_save_credentials' ] );
 		add_action( 'wp_ajax_cc_wizard_remove_token', [ $this, 'ajax_wizard_remove_token' ] );
 		add_action( 'wp_ajax_cc_wizard_complete', [ $this, 'ajax_wizard_complete' ] );
+	}
+	
+	/**
+	 * AJAX handler for saving DigitalOcean API token.
+	 */
+	public function ajax_wizard_save_do_token() {
+		check_ajax_referer( 'cc_wizard_nonce', 'nonce' );
+		
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( [ 'message' => __( 'Insufficient permissions.', 'correct-contact' ) ] );
+		}
+		
+		$token = isset( $_POST['token'] ) ? sanitize_text_field( $_POST['token'] ) : '';
+		
+		if ( empty( $token ) ) {
+			wp_send_json_error( [ 'message' => __( 'API token is required.', 'correct-contact' ) ] );
+		}
+		
+		Options::update( Settings::DO_TOKEN, $token );
+		
+		wp_send_json_success();
 	}
 	
 	/**
@@ -104,11 +127,11 @@ class Ajax {
 		}
 		
 		// Save credentials
-		update_option( Settings::APP_URL, $app_url );
-		update_option( Settings::ACCESS_TOKEN, $access_token );
+		Options::update( Settings::APP_URL, $app_url );
+		Options::update( Settings::ACCESS_TOKEN, $access_token );
 		
-		// Store DO token temporarily (will be removed after wizard completion)
-		update_option( 'cc_do_token_temp', $do_token );
+		// Store DO token (no longer temporary, but still in the main options row)
+		Options::update( Settings::DO_TOKEN, $do_token );
 		
 		wp_send_json_success();
 	}
@@ -123,7 +146,14 @@ class Ajax {
 			wp_send_json_error( [ 'message' => __( 'Insufficient permissions.', 'correct-contact' ) ] );
 		}
 		
-		// Remove temporary DO token
+		// Remove DO token from options
+		$options = get_option( Settings::OPTION_NAME, [] );
+		if ( isset( $options[ Settings::DO_TOKEN ] ) ) {
+			unset( $options[ Settings::DO_TOKEN ] );
+			update_option( Settings::OPTION_NAME, $options );
+		}
+		
+		// Also remove temporary DO token if it exists
 		delete_option( 'cc_do_token_temp' );
 		
 		wp_send_json_success();
@@ -140,10 +170,17 @@ class Ajax {
 		}
 		
 		// Mark setup as completed
-		update_option( Settings::SETUP_COMPLETED, true );
+		Options::update( Settings::SETUP_COMPLETED, true );
 		
 		// Clean up temporary token if still exists
 		delete_option( 'cc_do_token_temp' );
+		
+		// Also clean up DO token from main options as it's no longer needed after setup
+		$options = get_option( Settings::OPTION_NAME, [] );
+		if ( isset( $options[ Settings::DO_TOKEN ] ) ) {
+			unset( $options[ Settings::DO_TOKEN ] );
+			update_option( Settings::OPTION_NAME, $options );
+		}
 		
 		wp_send_json_success();
 	}

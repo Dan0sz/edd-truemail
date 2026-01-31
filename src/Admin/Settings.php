@@ -27,6 +27,8 @@ class Settings {
 
     const SETUP_COMPLETED = 'cc_setup_completed';
 
+    const DO_TOKEN = 'cc_do_token';
+
     const SETTINGS_FIELD_GENERAL = 'cc-general-settings';
 
     const SETTINGS_FIELD_ADVANCED = 'cc-advanced-settings';
@@ -254,6 +256,10 @@ class Settings {
             $input[ self::APP_URL ] = esc_url_raw( $input[ self::APP_URL ] );
         }
 
+        if ( isset( $input[ self::DO_TOKEN ] ) ) {
+            $input[ self::DO_TOKEN ] = sanitize_text_field( $input[ self::DO_TOKEN ] );
+        }
+
         if ( isset( $input[ self::BLOCK_PURCHASE ] ) ) {
             $input[ self::BLOCK_PURCHASE ] = (int) $input[ self::BLOCK_PURCHASE ];
         }
@@ -371,25 +377,33 @@ class Settings {
                 <!-- Slide 2: Create API token -->
                 <div class="cc-wizard-slide" data-slide="2" style="display: none;">
                     <h2><?php esc_html_e( 'Create a DigitalOcean API token', 'correct-contact' ); ?></h2>
-                    <p><?php esc_html_e( 'CorrectContact needs a DigitalOcean API token to automatically create the email validation app for you.', 'correct-contact' ); ?></p>
-                    <p><?php esc_html_e( 'This token is used only during setup. You will be prompted to remove this token after the setup is complete.', 'correct-contact' ); ?></p>
-                    <h2><?php _e( 'Required Scopes/Permissions', 'correct-contact' ); ?></h2>
-                    <p><?php _e( 'Most of the token\'s settings can keep their default value. You only have to make sure the permissions (or <strong>custom scopes</strong>) are configured as follows:',
-                                'correct-contact'
-                        ); ?></p>
-                    <ul>
-                        <li><strong><?php esc_html_e( 'Token Name', 'correct-contact' ); ?>:</strong> <?php esc_html_e( 'Correct Contact', 'correct-contact' ); ?></li>
-                        <li><strong><?php esc_html_e( 'Droplet', 'correct-contact' ); ?>:</strong> <?php esc_html_e( 'create/read', 'correct-contact' ); ?></li>
-                        <li><strong><?php esc_html_e( 'Project', 'correct-contact' ); ?>:</strong> <?php esc_html_e( 'create/read', 'correct-contact' ); ?></li>
-                    </ul>
+                    <p><?php esc_html_e( 'CorrectContact needs a DigitalOcean API token to create the email validation app for you.', 'correct-contact' ); ?></p>
+                    <p><?php wp_kses_post( 'This token is used <strong>only during setup</strong>. You will be prompted to remove it once the setup is complete.', 'correct-contact' ); ?></p>
+                    <p><?php esc_html_e( 'To create the API token, follow these steps', 'correct-contact' ); ?>:</p>
+                    <ol>
+                        <li><a href="https://cloud.digitalocean.com/account/api/tokens/new"
+                               target="_blank"><?php esc_html_e( 'Click here to start creating a new API token', 'correct-contact' ); ?></a>
+                        </li>
+                        <li>
+                            <?php esc_html_e( 'Set the Token Name to "Correct Contact". You can leave the Expiration and Scopes setting to their defaults.', 'correct-contact' ); ?>
+                        </li>
+                        <li>
+                            <?php esc_html_e( 'Make sure the token has the following scopes/permissions:', 'correct-contact' ); ?>
+                            <ul>
+                                <li><?php esc_html_e( 'Droplet: create/read', 'correct-contact' ); ?></li>
+                                <li><?php esc_html_e( 'Project: create/read', 'correct-contact' ); ?></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <?php esc_html_e( 'Click "Generate Token"', 'correct-contact' ); ?>
+                        </li>
+                        <li>
+                            <?php esc_html_e( 'Copy the token and paste it in the field below.', 'correct-contact' ); ?>
+                        </li>
+                    </ol>
                     <p>
-                        <a href="https://cloud.digitalocean.com/account/api/tokens/new" target="_blank"
-                           class="button button-secondary"><?php esc_html_e( 'Create API token', 'correct-contact' ); ?></a>
-                    </p>
-
-                    <p>
-                        <label for="cc-do-token"><?php esc_html_e( 'DigitalOcean API Token', 'correct-contact' ); ?></label><br>
                         <input type="text" id="cc-do-token" class="regular-text"
+                               value="<?php echo esc_attr( Options::get( self::DO_TOKEN ) ); ?>"
                                placeholder="<?php esc_attr_e( 'Paste your API token here', 'correct-contact' ); ?>">
                     </p>
 
@@ -404,24 +418,17 @@ class Settings {
                 <!-- Slide 3: Create app -->
                 <div class="cc-wizard-slide" data-slide="3" style="display: none;">
                     <h2><?php esc_html_e( 'Create your email validation app', 'correct-contact' ); ?></h2>
-                    <p><?php esc_html_e( 'CorrectContact will now create a small app, called Truemail, in your DigitalOcean account.', 'correct-contact' ); ?></p>
-                    <p><?php esc_html_e( 'CorrectContact is powered by Truemail and runs entirely in your own infrastructure.', 'correct-contact' ); ?></p>
-
-                    <div class="cc-callout cc-callout-info">
-                        <h3><?php esc_html_e( 'Estimated monthly cost', 'correct-contact' ); ?></h3>
-                        <p><?php esc_html_e( 'DigitalOcean will charge you directly for the infrastructure.', 'correct-contact' ); ?></p>
-                        <p><?php esc_html_e( 'The app runs on a basic server costing $10 per month.', 'correct-contact' ); ?></p>
-                        <p><?php esc_html_e( 'This is sufficient for most websites.', 'correct-contact' ); ?></p>
-                        <p><?php esc_html_e( 'You can upgrade the server later if you need more processing power or bandwidth.', 'correct-contact' ); ?></p>
-                        <p><?php esc_html_e( 'CorrectContact does not add any markup.', 'correct-contact' ); ?></p>
-                    </div>
+                    <p><?php esc_html_e( 'Once you click Create app, CorrectContact will set up your email validation service.', 'correct-contact' ); ?></p>
+                    <p><?php esc_html_e( 'A small app, called Truemail, will be installed on a DigitalOcean droplet in your account. This app is responsible for validating email addresses in real time.', 'correct-contact' ); ?></p>
+                    <p><?php esc_html_e( 'The app runs on a basic server costing $10 per month, billed directly by DigitalOcean. Truemail is a lightweight email validation service, and this setup is sufficient for most websites. If you need more processing power or bandwidth, you can upgrade the server later.', 'correct-contact' ); ?></p>
+                    <p><?php esc_html_e( 'CorrectContact does not charge for infrastructure and does not add any markup.', 'correct-contact' ); ?></p>
 
                     <div class="cc-wizard-provision-content">
                         <div class="cc-wizard-actions">
                             <button type="button"
                                     class="button button-primary cc-wizard-provision"><?php esc_html_e( 'Create app', 'correct-contact' ); ?></button>
                         </div>
-                        <p class="description"><?php esc_html_e( 'This will take 1–2 minutes', 'correct-contact' ); ?></p>
+                        <p class="cc-wizard-footer"><?php esc_html_e( 'This will take 1–2 minutes', 'correct-contact' ); ?></p>
                     </div>
 
                     <div class="cc-wizard-provision-progress" style="display: none;">
