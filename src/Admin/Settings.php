@@ -25,9 +25,9 @@ class Settings {
 
     const FIELD_SELECTORS = 'cc_field_selectors';
 
-	const SETUP_COMPLETED = 'cc_setup_completed';
+    const SETUP_COMPLETED = 'cc_setup_completed';
 
-	const SETTINGS_FIELD_GENERAL = 'cc-general-settings';
+    const SETTINGS_FIELD_GENERAL = 'cc-general-settings';
 
     const SETTINGS_FIELD_ADVANCED = 'cc-advanced-settings';
 
@@ -40,9 +40,9 @@ class Settings {
     public function __construct() {
         $this->active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( $_GET['tab'] ) : self::SETTINGS_FIELD_GENERAL;
 
-	    new Wizard\Ajax();
+        new Wizard\Ajax();
 
-	    add_action( 'admin_menu', [ $this, 'add_menu' ] );
+        add_action( 'admin_menu', [ $this, 'add_menu' ] );
         add_action( 'admin_init', [ $this, 'register_settings' ] );
         add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
 
@@ -164,6 +164,19 @@ class Settings {
         // Enqueue admin styles
         wp_enqueue_style( 'cc-admin', plugin_dir_url( CC_PLUGIN_FILE ) . 'assets/css/cc-admin.css', [], filemtime( plugin_dir_path( CC_PLUGIN_FILE ) . 'assets/css/cc-admin.css' ) );
 
+        // If setup is not completed, enqueue wizard assets
+        if ( ! $this->is_setup_completed() ) {
+            wp_enqueue_style( 'cc-wizard', plugin_dir_url( CC_PLUGIN_FILE ) . 'assets/css/cc-wizard.css', [], filemtime( plugin_dir_path( CC_PLUGIN_FILE ) . 'assets/css/cc-wizard.css' ) );
+            wp_enqueue_script( 'cc-wizard', plugin_dir_url( CC_PLUGIN_FILE ) . 'assets/js/cc-wizard.js', [ 'jquery' ], filemtime( plugin_dir_path( CC_PLUGIN_FILE ) . 'assets/js/cc-wizard.js' ), true );
+
+            wp_localize_script( 'cc-wizard', 'ccWizard', [
+                    'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+                    'nonce'   => wp_create_nonce( 'cc_wizard_nonce' ),
+            ] );
+
+            return;
+        }
+
         // Enqueue Select2
         wp_enqueue_style( 'select2', 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css' );
         wp_enqueue_script( 'select2', 'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js', [ 'jquery' ] );
@@ -177,6 +190,15 @@ class Settings {
 				});
 			});
 		" );
+    }
+
+    /**
+     * Check if setup wizard has been completed.
+     *
+     * @return bool
+     */
+    private function is_setup_completed() {
+        return (bool) get_option( self::SETUP_COMPLETED, false );
     }
 
     /**
@@ -254,6 +276,14 @@ class Settings {
      * Render settings page.
      */
     public function render_settings_page() {
+        // Show wizard if setup is not completed
+        if ( ! $this->is_setup_completed() ) {
+            $this->render_wizard();
+
+            return;
+        }
+
+        // Show normal settings page
         ?>
         <div class="wrap cc-admin">
             <h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
@@ -262,6 +292,190 @@ class Settings {
                     <?php do_action( 'cc_settings_tab' ); ?>
                 </h2>
                 <?php do_action( 'cc_settings_content' ); ?>
+            </div>
+        </div>
+        <?php
+    }
+
+    /**
+     * Render the setup wizard.
+     */
+    private function render_wizard() {
+        ?>
+        <div class="wrap cc-admin">
+            <h1><?php echo esc_html__( 'Correct Contact Setup Wizard', 'correct-contact' ); ?></h1>
+            <h2 class="cc-nav nav-tab-wrapper">
+                <a href="#" class="nav-tab nav-tab-active cc-wizard-nav-item"
+                   data-slide="0"><?php esc_html_e( 'Getting Started', 'correct-contact' ); ?></a>
+                <a href="#" class="nav-tab cc-wizard-nav-item"
+                   data-slide="1"><?php esc_html_e( 'Create Account', 'correct-contact' ); ?></a>
+                <a href="#" class="nav-tab cc-wizard-nav-item"
+                   data-slide="2"><?php esc_html_e( 'Create API Token', 'correct-contact' ); ?></a>
+                <a href="#" class="nav-tab cc-wizard-nav-item"
+                   data-slide="3"><?php esc_html_e( 'Create App', 'correct-contact' ); ?></a>
+                <a href="#" class="nav-tab cc-wizard-nav-item"
+                   data-slide="4"><?php esc_html_e( 'Done', 'correct-contact' ); ?></a>
+            </h2>
+            <div class="cc-wizard-container">
+                <!-- Slide 0: Intro -->
+                <div class="cc-wizard-slide" data-slide="0">
+                    <h2><?php esc_html_e( 'Before we get started', 'correct-contact' ); ?></h2>
+                    <p><?php esc_html_e( 'CorrectContact runs on your own infrastructure. It does not use external email verification services.', 'correct-contact' ); ?></p>
+                    <p><?php esc_html_e( 'Instead, we\'re going to create a small server in your own DigitalOcean account.', 'correct-contact' ); ?></p>
+
+                    <h3><?php esc_html_e( 'Why DigitalOcean?', 'correct-contact' ); ?></h3>
+                    <ul>
+                        <li><?php esc_html_e( 'Automatically create your own email validation server', 'correct-contact' ); ?></li>
+                        <li><?php esc_html_e( 'Unlimited email validations for a low, monthly fee', 'correct-contact' ); ?></li>
+                        <li><?php esc_html_e( 'Reliable, EU-based infrastructure', 'correct-contact' ); ?></li>
+                    </ul>
+
+                    <h3><?php esc_html_e( 'What this means for you:', 'correct-contact' ); ?></h3>
+                    <ul>
+                        <li><?php esc_html_e( 'No third-party email validation services', 'correct-contact' ); ?></li>
+                        <li><?php esc_html_e( 'No API limits or usage-based pricing', 'correct-contact' ); ?></li>
+                        <li><?php esc_html_e( 'Full control over your data and infrastructure', 'correct-contact' ); ?></li>
+                    </ul>
+
+                    <div class="cc-wizard-actions">
+                        <button type="button"
+                                class="button button-primary cc-wizard-next"><?php esc_html_e( 'Get started', 'correct-contact' ); ?></button>
+                    </div>
+
+                    <p class="cc-wizard-footer"><?php esc_html_e( 'You\'re in control at all times. CorrectContact only automates the setup.', 'correct-contact' ); ?></p>
+                </div>
+
+                <!-- Slide 1: Create DigitalOcean account -->
+                <div class="cc-wizard-slide" data-slide="1" style="display: none;">
+                    <h2><?php esc_html_e( 'Create your DigitalOcean account', 'correct-contact' ); ?></h2>
+                    <p><?php esc_html_e( 'To run the email validation service, CorrectContact uses a small server in your own DigitalOcean account.', 'correct-contact' ); ?></p>
+                    <p><?php esc_html_e( 'If you don\'t have a DigitalOcean account yet, create one now.', 'correct-contact' ); ?></p>
+                    <p><?php esc_html_e( 'If you already have an account, you can continue to the next step.', 'correct-contact' ); ?></p>
+
+                    <div class="cc-notice info">
+                        <h3><?php esc_html_e( 'New to DigitalOcean?', 'correct-contact' ); ?></h3>
+                        <p><?php esc_html_e( 'New accounts receive $200 in free credit to try DigitalOcean for 60 days.', 'correct-contact' ); ?></p>
+                        <p><?php esc_html_e( 'This is more than enough to run your email validation app for weeks at no cost.', 'correct-contact' ); ?></p>
+                    </div>
+
+                    <div class="cc-wizard-actions">
+                        <a href="https://m.do.co/c/1cfcf14ddad0" target="_blank"
+                           class="button button-primary"><?php esc_html_e( 'Create DigitalOcean account', 'correct-contact' ); ?></a>
+                        <button type="button"
+                                class="button button-secondary cc-wizard-next"><?php esc_html_e( 'I already have an account → Continue', 'correct-contact' ); ?></button>
+                    </div>
+
+                    <p class="cc-wizard-footer"><?php esc_html_e( 'No server is created yet. You remain in full control of your account and infrastructure.', 'correct-contact' ); ?></p>
+                </div>
+
+                <!-- Slide 2: Create API token -->
+                <div class="cc-wizard-slide" data-slide="2" style="display: none;">
+                    <h2><?php esc_html_e( 'Create a DigitalOcean API token', 'correct-contact' ); ?></h2>
+                    <p><?php esc_html_e( 'CorrectContact needs a DigitalOcean API token to automatically create the email validation app in your account.', 'correct-contact' ); ?></p>
+                    <p><?php esc_html_e( 'This token is used only during setup. You can revoke or remove this token after the setup is complete.', 'correct-contact' ); ?></p>
+                    <p><?php esc_html_e( 'Set it up as follows:', 'correct-contact' ); ?></p>
+                    <p><strong><?php esc_html_e( 'Token name', 'correct-contact' ); ?>: </strong><?php esc_html_e( 'Correct Contact', 'correct-contact' ); ?></p>
+                    <p>
+                        <strong><?php esc_html_e( 'Custom scopes', 'correct-contact' ); ?></strong>: Droplet:
+                        create/read and Project: create/read.
+                    </p>
+                    <p><strong><?php _e( 'Generate Token', 'correct-contact' ); ?></strong></p>
+
+                    <p>
+                        <a href="https://cloud.digitalocean.com/account/api/tokens" target="_blank"
+                           class="button button-secondary"><?php esc_html_e( 'Create API token', 'correct-contact' ); ?></a>
+                    </p>
+
+                    <p>
+                        <label for="cc-do-token"><?php esc_html_e( 'DigitalOcean API Token', 'correct-contact' ); ?></label><br>
+                        <input type="text" id="cc-do-token" class="regular-text"
+                               placeholder="<?php esc_attr_e( 'Paste your API token here', 'correct-contact' ); ?>">
+                    </p>
+
+                    <div class="cc-wizard-actions">
+                        <button type="button" class="button button-primary cc-wizard-next"
+                                disabled><?php esc_html_e( 'Continue', 'correct-contact' ); ?></button>
+                    </div>
+
+                    <p class="cc-wizard-footer"><?php esc_html_e( 'The token is stored locally and never shared.', 'correct-contact' ); ?></p>
+                </div>
+
+                <!-- Slide 3: Create app -->
+                <div class="cc-wizard-slide" data-slide="3" style="display: none;">
+                    <h2><?php esc_html_e( 'Create your email validation app', 'correct-contact' ); ?></h2>
+                    <p><?php esc_html_e( 'CorrectContact will now create a small app, called Truemail, in your DigitalOcean account.', 'correct-contact' ); ?></p>
+                    <p><?php esc_html_e( 'CorrectContact is powered by Truemail and runs entirely in your own infrastructure.', 'correct-contact' ); ?></p>
+
+                    <div class="cc-callout cc-callout-info">
+                        <h3><?php esc_html_e( 'Estimated monthly cost', 'correct-contact' ); ?></h3>
+                        <p><?php esc_html_e( 'DigitalOcean will charge you directly for the infrastructure.', 'correct-contact' ); ?></p>
+                        <p><?php esc_html_e( 'The app runs on a basic server costing $10 per month.', 'correct-contact' ); ?></p>
+                        <p><?php esc_html_e( 'This is sufficient for most websites.', 'correct-contact' ); ?></p>
+                        <p><?php esc_html_e( 'You can upgrade the server later if you need more processing power or bandwidth.', 'correct-contact' ); ?></p>
+                        <p><?php esc_html_e( 'CorrectContact does not add any markup.', 'correct-contact' ); ?></p>
+                    </div>
+
+                    <div class="cc-wizard-provision-content">
+                        <div class="cc-wizard-actions">
+                            <button type="button"
+                                    class="button button-primary cc-wizard-provision"><?php esc_html_e( 'Create app', 'correct-contact' ); ?></button>
+                        </div>
+                        <p class="description"><?php esc_html_e( 'This will take 1–2 minutes', 'correct-contact' ); ?></p>
+                    </div>
+
+                    <div class="cc-wizard-provision-progress" style="display: none;">
+                        <div class="cc-progress-bar">
+                            <div class="cc-progress-fill"></div>
+                        </div>
+                        <ul class="cc-progress-steps">
+                            <li data-step="project"><?php esc_html_e( 'Creating project', 'correct-contact' ); ?></li>
+                            <li data-step="server"><?php esc_html_e( 'Creating server', 'correct-contact' ); ?></li>
+                            <li data-step="install"><?php esc_html_e( 'Installing Truemail', 'correct-contact' ); ?></li>
+                            <li data-step="secure"><?php esc_html_e( 'Securing API access', 'correct-contact' ); ?></li>
+                            <li data-step="done"><?php esc_html_e( 'Done!', 'correct-contact' ); ?></li>
+                        </ul>
+                    </div>
+
+                    <div class="cc-wizard-provision-error" style="display: none;">
+                        <div class="cc-callout cc-callout-error">
+                            <p class="cc-error-message"></p>
+                            <div class="cc-wizard-actions">
+                                <a href="https://cloud.digitalocean.com/account/billing" target="_blank"
+                                   class="button button-secondary cc-add-payment"><?php esc_html_e( 'Add payment method', 'correct-contact' ); ?></a>
+                                <button type="button"
+                                        class="button button-primary cc-wizard-retry"><?php esc_html_e( 'Retry setup', 'correct-contact' ); ?></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 4: Success -->
+                <div class="cc-wizard-slide" data-slide="4" style="display: none;">
+                    <h2><?php esc_html_e( 'Your Truemail app is up and running!', 'correct-contact' ); ?></h2>
+                    <p><?php esc_html_e( 'Your email validation service is ready to validate email addresses in your forms.', 'correct-contact' ); ?></p>
+                    <p><?php esc_html_e( 'CorrectContact is now connected to your Truemail app, running entirely in your own DigitalOcean account.', 'correct-contact' ); ?></p>
+
+                    <div class="cc-callout cc-callout-success">
+                        <h3><?php esc_html_e( 'You\'re in control.', 'correct-contact' ); ?></h3>
+                        <ul>
+                            <li><?php esc_html_e( 'The app runs entirely in your DigitalOcean account', 'correct-contact' ); ?></li>
+                            <li><?php esc_html_e( 'No third-party email validation services are used', 'correct-contact' ); ?></li>
+                            <li><?php esc_html_e( 'CorrectContact does not process or store email addresses', 'correct-contact' ); ?></li>
+                        </ul>
+                    </div>
+
+                    <h3><?php esc_html_e( 'API token cleanup', 'correct-contact' ); ?></h3>
+                    <p><?php esc_html_e( 'CorrectContact no longer needs your DigitalOcean API token. You can safely remove it now.', 'correct-contact' ); ?></p>
+                    <p>
+                        <button type="button"
+                                class="button button-secondary cc-wizard-remove-token"><?php esc_html_e( 'Remove API token', 'correct-contact' ); ?></button>
+                    </p>
+
+                    <div class="cc-wizard-actions">
+                        <button type="button"
+                                class="button button-primary cc-wizard-complete"><?php esc_html_e( 'Continue to settings', 'correct-contact' ); ?></button>
+                    </div>
+                </div>
             </div>
         </div>
         <?php
