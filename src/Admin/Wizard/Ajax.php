@@ -172,12 +172,7 @@ class Ajax {
 				break;
 			
 			case 'server':
-				// Step "server" is repurposed for "Create App" as per instructions
-				$domain = str_replace( [ 'http://', 'https://' ], '', get_home_url() );
-				$name   = str_replace( '.', '-', $domain );
-				// App names must be lowercase and only contain alphanumeric characters and dashes
-				$name = strtolower( preg_replace( '/[^a-zA-Z0-9-]/', '', $name ) );
-				
+				$name         = __( 'correct-contact', 'correct-contact' );
 				$access_token = wp_generate_password( 32, false, false );
 				$admin_email  = get_option( 'admin_email' );
 				
@@ -246,8 +241,8 @@ class Ajax {
 					}
 				}
 				
-				// Store the generated access token temporarily to retrieve later
-				Options::update( 'cc_temp_access_token', $access_token );
+				// Store the generated Truemail access token temporarily to retrieve later
+				Options::update( Settings::ACCESS_TOKEN, $access_token );
 				Options::update( Settings::REGION, $region );
 				
 				$this->handle_api_response( $response, 'server' );
@@ -318,27 +313,17 @@ class Ajax {
 					wp_send_json_error( [ 'message' => __( 'Could not retrieve app URL.', 'correct-contact' ) ] );
 				}
 				
-				$access_token = Options::get( 'cc_temp_access_token' );
-				
-				if ( ! empty( $access_token ) ) {
-					delete_option( 'cc_temp_access_token' );
-				} else {
-					// Fallback: If it's an existing app, we can't retrieve the generated token.
-					// We'll have to rely on the one already stored in the database if available.
-					$access_token = Options::get( Settings::ACCESS_TOKEN );
-				}
+				Options::update( Settings::APP_URL, $app_url );
 				
 				wp_send_json_success( [
-					'step'         => 'secure',
-					'app_url'      => $app_url,
-					'access_token' => $access_token,
+					'step' => 'secure'
 				] );
+				
 				break;
-			
 			case 'done':
 				wp_send_json_success( [ 'step' => 'done' ] );
+				
 				break;
-			
 			default:
 				wp_send_json_error( [ 'message' => __( 'Invalid step.', 'correct-contact' ) ] );
 		}
@@ -357,6 +342,14 @@ class Ajax {
 		
 		$code = wp_remote_retrieve_response_code( $response );
 		$body = json_decode( wp_remote_retrieve_body( $response ), true );
+		
+		if ( $code === 401 ) {
+			wp_send_json_error( [ 'message' => __( 'Invalid DigitalOcean API token. Please check your token and try again.', 'correct-contact' ) ] );
+		}
+		
+		if ( $code === 403 ) {
+			wp_send_json_error( [ 'message' => __( 'The DigitalOcean API token does not have the required permissions (App Platform: read/write, Droplet: create/read, Project: create/read).', 'correct-contact' ) ] );
+		}
 		
 		if ( $code === 402 || ( isset( $body['id'] ) && $body['id'] === 'payment_required' ) ) {
 			wp_send_json_error( [
@@ -396,7 +389,6 @@ class Ajax {
 		
 		$app_url      = isset( $_POST['app_url'] ) ? esc_url_raw( $_POST['app_url'] ) : '';
 		$access_token = isset( $_POST['access_token'] ) ? sanitize_text_field( $_POST['access_token'] ) : '';
-		$do_token     = isset( $_POST['do_token'] ) ? sanitize_text_field( $_POST['do_token'] ) : '';
 		
 		if ( empty( $app_url ) || empty( $access_token ) ) {
 			wp_send_json_error( [ 'message' => __( 'Missing credentials.', 'correct-contact' ) ] );
@@ -405,9 +397,6 @@ class Ajax {
 		// Save credentials
 		Options::update( Settings::APP_URL, $app_url );
 		Options::update( Settings::ACCESS_TOKEN, $access_token );
-		
-		// Store DO token (no longer temporary, but still in the main options row)
-		Options::update( Settings::DO_TOKEN, $do_token );
 		
 		wp_send_json_success();
 	}
@@ -429,9 +418,6 @@ class Ajax {
 			update_option( Settings::OPTION_NAME, $options );
 		}
 		
-		// Also remove temporary DO token if it exists
-		delete_option( 'cc_do_token_temp' );
-		
 		wp_send_json_success();
 	}
 	
@@ -448,15 +434,7 @@ class Ajax {
 		// Mark setup as completed
 		Options::update( Settings::SETUP_COMPLETED, true );
 		
-		// Clean up temporary token if still exists
-		delete_option( 'cc_do_token_temp' );
-		
-		// Also clean up DO token from main options as it's no longer needed after setup
-		$options = get_option( Settings::OPTION_NAME, [] );
-		if ( isset( $options[ Settings::DO_TOKEN ] ) ) {
-			unset( $options[ Settings::DO_TOKEN ] );
-			update_option( Settings::OPTION_NAME, $options );
-		}
+		delete_option( Settings::DO_TOKEN );
 		
 		wp_send_json_success();
 	}

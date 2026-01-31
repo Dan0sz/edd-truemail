@@ -453,7 +453,6 @@
             formData.append('nonce', ccWizard.nonce);
             formData.append('app_url', this.appUrl);
             formData.append('access_token', this.accessToken);
-            formData.append('do_token', this.doToken);
 
             fetch(ccWizard.ajaxUrl, {
                 method: 'POST',
