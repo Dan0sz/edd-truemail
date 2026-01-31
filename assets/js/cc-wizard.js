@@ -6,7 +6,7 @@
  * @copyright © 2023-2026 Daan van den Bergh
  */
 
-(function($) {
+(function ($) {
     'use strict';
 
     const CCWizard = {
@@ -15,12 +15,15 @@
         appUrl: '',
         accessToken: '',
 
-        init: function() {
+        init: function () {
             this.bindEvents();
             this.showSlide(0);
         },
 
-        bindEvents: function() {
+        bindEvents: function () {
+            // Navigation item clicks
+            $(document).on('click', '.cc-wizard-nav-item', this.handleNavClick.bind(this));
+
             // Next button
             $(document).on('click', '.cc-wizard-next', this.nextSlide.bind(this));
 
@@ -37,15 +40,57 @@
             $(document).on('click', '.cc-wizard-complete', this.completeWizard.bind(this));
         },
 
-        showSlide: function(slideNumber) {
+        handleNavClick: function (e) {
+            e.preventDefault();
+            const $navItem = $(e.currentTarget);
+            const targetSlide = parseInt($navItem.data('slide'));
+
+            // Don't allow clicking on disabled items
+            if ($navItem.hasClass('disabled')) {
+                return;
+            }
+
+            // Only allow clicking on completed items or current item
+            if ($navItem.hasClass('completed') || $navItem.hasClass('nav-tab-active')) {
+                this.showSlide(targetSlide);
+            }
+        },
+
+        showSlide: function (slideNumber) {
             $('.cc-wizard-slide').hide();
             $('.cc-wizard-slide[data-slide="' + slideNumber + '"]').fadeIn(300);
             this.currentSlide = slideNumber;
+
+            // Update navigation states
+            this.updateNavigationStates(slideNumber);
         },
 
-        nextSlide: function(e) {
+        updateNavigationStates: function (currentSlide) {
+            const $navItems = $('.cc-wizard-nav-item');
+
+            $navItems.each(function () {
+                const $item = $(this);
+                const itemSlide = parseInt($item.data('slide'));
+
+                // Remove all state classes
+                $item.removeClass('nav-tab-active completed disabled');
+
+                if (itemSlide === currentSlide) {
+                    // Current slide - active
+                    $item.addClass('nav-tab-active');
+                } else if (itemSlide < currentSlide) {
+                    // Previous slides - completed and clickable
+                    $item.addClass('completed');
+                } else {
+                    // Future slides - disabled
+                    $item.addClass('disabled');
+                }
+            });
+        },
+
+        nextSlide: function (e) {
             e.preventDefault();
-            
+
             // Save token if on slide 2
             if (this.currentSlide === 2) {
                 this.doToken = $('#cc-do-token').val().trim();
@@ -54,7 +99,7 @@
             this.showSlide(this.currentSlide + 1);
         },
 
-        validateToken: function() {
+        validateToken: function () {
             const token = $('#cc-do-token').val().trim();
             const $button = $('.cc-wizard-slide[data-slide="2"] .cc-wizard-next');
 
@@ -65,7 +110,7 @@
             }
         },
 
-        createApp: function(e) {
+        createApp: function (e) {
             e.preventDefault();
 
             const $button = $(e.currentTarget);
@@ -76,7 +121,7 @@
 
             // Hide button and content, show progress
             $button.hide();
-            $content.fadeOut(200, function() {
+            $content.fadeOut(200, function () {
                 $progress.fadeIn(300);
             });
 
@@ -84,7 +129,7 @@
             this.provisionServer();
         },
 
-        provisionServer: function() {
+        provisionServer: function () {
             const self = this;
             let currentStep = 0;
             const steps = ['project', 'server', 'install', 'secure', 'done'];
@@ -112,7 +157,7 @@
                         step: steps[step],
                         token: self.doToken
                     },
-                    success: function(response) {
+                    success: function (response) {
                         if (response.success) {
                             // Store credentials if returned
                             if (response.data.app_url) {
@@ -124,12 +169,12 @@
 
                             // Move to next step or complete
                             if (step < steps.length - 1) {
-                                setTimeout(function() {
+                                setTimeout(function () {
                                     processStep(step + 1);
                                 }, 500);
                             } else {
                                 // Provisioning complete
-                                setTimeout(function() {
+                                setTimeout(function () {
                                     self.saveCredentials();
                                 }, 1000);
                             }
@@ -137,7 +182,7 @@
                             self.handleProvisioningError(response.data, step);
                         }
                     },
-                    error: function(xhr, status, error) {
+                    error: function (xhr, status, error) {
                         self.handleProvisioningError({
                             message: 'Network error: ' + error,
                             code: 'network_error'
@@ -150,7 +195,7 @@
             processStep(0);
         },
 
-        handleProvisioningError: function(error, step) {
+        handleProvisioningError: function (error, step) {
             const $slide = $('.cc-wizard-slide[data-slide="3"]');
             const $progress = $slide.find('.cc-wizard-progress');
             const $error = $slide.find('.cc-wizard-error');
@@ -161,7 +206,7 @@
             $('.cc-wizard-progress-steps li').eq(step).addClass('error');
 
             // Hide progress, show error
-            $progress.fadeOut(200, function() {
+            $progress.fadeOut(200, function () {
                 $errorMessage.text(error.message || 'An error occurred during setup.');
 
                 // Handle specific error types
@@ -183,7 +228,7 @@
             $(document).on('click', '.cc-wizard-retry', this.retryProvisioning.bind(this));
         },
 
-        retryProvisioning: function(e) {
+        retryProvisioning: function (e) {
             e.preventDefault();
 
             const $slide = $('.cc-wizard-slide[data-slide="3"]');
@@ -195,7 +240,7 @@
             $('.cc-wizard-progress-fill').css('width', '0%');
 
             // Hide error, show progress
-            $error.fadeOut(200, function() {
+            $error.fadeOut(200, function () {
                 $progress.fadeIn(300);
             });
 
@@ -203,7 +248,7 @@
             this.provisionServer();
         },
 
-        saveCredentials: function() {
+        saveCredentials: function () {
             const self = this;
 
             $.ajax({
@@ -216,7 +261,7 @@
                     access_token: this.accessToken,
                     do_token: this.doToken
                 },
-                success: function(response) {
+                success: function (response) {
                     if (response.success) {
                         // Move to success slide
                         self.showSlide(4);
@@ -224,13 +269,13 @@
                         alert('Failed to save credentials. Please try again.');
                     }
                 },
-                error: function() {
+                error: function () {
                     alert('Failed to save credentials. Please try again.');
                 }
             });
         },
 
-        removeToken: function(e) {
+        removeToken: function (e) {
             e.preventDefault();
 
             const $button = $(e.currentTarget);
@@ -243,7 +288,7 @@
                     action: 'cc_wizard_remove_token',
                     nonce: ccWizard.nonce
                 },
-                success: function(response) {
+                success: function (response) {
                     if (response.success) {
                         $button.text('Token removed').addClass('button-disabled');
                         $('.cc-wizard-token-cleanup').fadeOut(300);
@@ -252,14 +297,14 @@
                         alert('Failed to remove token. Please try again.');
                     }
                 },
-                error: function() {
+                error: function () {
                     $button.prop('disabled', false).text('Remove API token');
                     alert('Failed to remove token. Please try again.');
                 }
             });
         },
 
-        completeWizard: function(e) {
+        completeWizard: function (e) {
             e.preventDefault();
 
             const $button = $(e.currentTarget);
@@ -272,7 +317,7 @@
                     action: 'cc_wizard_complete',
                     nonce: ccWizard.nonce
                 },
-                success: function(response) {
+                success: function (response) {
                     if (response.success) {
                         // Reload page to show settings
                         window.location.reload();
@@ -281,7 +326,7 @@
                         alert('Failed to complete setup. Please try again.');
                     }
                 },
-                error: function() {
+                error: function () {
                     $button.prop('disabled', false).text('Continue to settings');
                     alert('Failed to complete setup. Please try again.');
                 }
@@ -290,8 +335,8 @@
     };
 
     // Initialize on document ready
-    $(document).ready(function() {
-        if ($('.cc-wizard-wrap').length) {
+    $(document).ready(function () {
+        if ($('.cc-admin').length) {
             CCWizard.init();
         }
     });

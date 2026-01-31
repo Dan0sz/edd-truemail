@@ -23,6 +23,14 @@
     max-width: 1350px;
 }
 
+.cc-admin p, .cc-admin ul, .cc-admin ol {
+    font-size: 14px;
+}
+
+.cc-admin ul, .cc-admin ol {
+    list-style: initial;
+}
+
 .cc-admin h1 {
     font-family: 'Poppins', Verdana, sans-serif;
     font-weight: 800;

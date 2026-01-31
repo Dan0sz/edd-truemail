@@ -6,15 +6,46 @@
  * @copyright © 2023-2026 Daan van den Bergh
  */
 
-/* Wizard Container */
-.cc-wizard-wrap {
-    max-width: 800px;
+/* Wizard Navigation */
+.cc-wizard-nav-item {
+    color: #000;
+    font-weight: 600;
+    border: 0;
+    background-color: transparent;
 }
 
+.cc-wizard-nav-item.nav-tab-active {
+    color: #00adda;
+}
+
+.cc-wizard-nav-item:hover {
+    color: #00adda;
+}
+
+.cc-wizard-nav-item.disabled {
+    color: #c3c4c7;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.cc-wizard-nav-item.disabled:hover {
+    color: #c3c4c7;
+    cursor: not-allowed;
+}
+
+.cc-wizard-nav-item.completed {
+    cursor: pointer;
+}
+
+.cc-wizard-nav-item.completed:hover {
+    color: #00adda;
+}
+
+/* Wizard Container */
 .cc-wizard-container {
     background-color: #fff;
-    padding: 40px 50px;
-    margin: 2em auto;
+    padding: 5px 25px 25px;
+    margin: 0 auto;
     border: 0;
     border-top: 4px solid #00adda;
     border-radius: 10px;
@@ -108,6 +139,45 @@
     color: #646970;
 }
 
+/* Wizard Notice */
+.cc-notice h3 {
+    margin-top: 0;
+}
+
+.cc-notice {
+    padding: 15px 5rem;
+    margin: 25px 0;
+    border-radius: 4px;
+    font-size: 14px;
+    line-height: 1.6;
+    position: relative;
+}
+
+.cc-notice.info {
+    background-color: #f0f6fc;
+    border-left: 4px solid #00adda;
+}
+
+.cc-notice::before {
+    position: absolute;
+    top: 50%;
+    translate: 0 calc(calc(1 / 2 * 100%) * -1);
+    left: 1rem;
+    padding-inline: 1.25rem;
+    padding-block: calc(var(.25rem) * 1.5);
+    margin-right: 2rem;
+    font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+    font-style: italic;
+    font-size: 1.875rem;
+    background-color: #fff;
+    border-radius: 50%;
+}
+
+.cc-notice.info::before {
+    color: #00adda;
+    content: "i";
+}
+
 /* Wizard Callout */
 .cc-wizard-callout {
     background-color: #f0f6fc;
@@ -141,7 +211,6 @@
     gap: 12px;
     align-items: center;
     padding-top: 20px;
-    border-top: 1px solid #dcdcde;
 }
 
 .cc-wizard-actions .button {
@@ -167,6 +236,19 @@
     background: #c3c4c7;
     border-color: #c3c4c7;
     cursor: not-allowed;
+}
+
+.cc-wizard-actions .button-secondary {
+    background: none;
+    border: none;
+    color: #00adda;
+    box-shadow: none;
+}
+
+.cc-wizard-actions .button-secondary:hover {
+    background: none;
+    border: none;
+    color: #0099cc;
 }
 
 .cc-wizard-subtext {
