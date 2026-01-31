@@ -398,6 +398,7 @@ class Settings {
                         <li>
                             <?php esc_html_e( 'Make sure the token has the following scopes/permissions:', 'correct-contact' ); ?>
                             <ul>
+                                <li><?php esc_html_e( 'App: create/read', 'correct-contact' ); ?></li>
                                 <li><?php esc_html_e( 'Droplet: create/read', 'correct-contact' ); ?></li>
                                 <li><?php esc_html_e( 'Project: create/read', 'correct-contact' ); ?></li>
                             </ul>
