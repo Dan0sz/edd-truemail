@@ -191,6 +191,7 @@ class Ajax {
 									'http_port'          => 8080,
 									'instance_count'     => 1,
 									'instance_size_slug' => 'basic-s', // $10/month, 1GB RAM, 1 vCPU
+									'dockerfile_path'    => 'Dockerfile',
 									'git'                => [
 										'repo_clone_url' => 'https://github.com/Dan0sz/truemail-rack-docker-image',
 										'branch'         => 'master',
@@ -221,7 +222,7 @@ class Ajax {
 				$code = wp_remote_retrieve_response_code( $response );
 				
 				// App names must be unique. If it already exists, find its ID.
-				if ( $code === 422 ) {
+				if ( $code === 409 ) {
 					$apps_response = wp_remote_get( 'https://api.digitalocean.com/v2/apps', [
 						'headers' => [
 							'Authorization' => 'Bearer ' . $token,
@@ -234,6 +235,7 @@ class Ajax {
 							foreach ( $apps_body['apps'] as $app ) {
 								if ( $app['spec']['name'] === $name ) {
 									wp_send_json_success( [ 'step' => 'server', 'app_id' => $app['id'] ] );
+									
 									exit;
 								}
 							}
