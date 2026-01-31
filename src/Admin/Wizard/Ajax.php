@@ -146,10 +146,9 @@ class Ajax {
 				] );
 				
 				$code = wp_remote_retrieve_response_code( $response );
-				$body = json_decode( wp_remote_retrieve_body( $response ), true );
 				
 				// If project already exists, we should find its ID and continue.
-				if ( $code === 422 ) {
+				if ( $code === 409 ) {
 					$projects_response = wp_remote_get( 'https://api.digitalocean.com/v2/projects', [
 						'headers' => [
 							'Authorization' => 'Bearer ' . $token,
@@ -225,7 +224,6 @@ class Ajax {
 				] );
 				
 				$code = wp_remote_retrieve_response_code( $response );
-				$body = json_decode( wp_remote_retrieve_body( $response ), true );
 				
 				// App names must be unique. If it already exists, find its ID.
 				if ( $code === 422 ) {
