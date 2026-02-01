@@ -26,7 +26,7 @@ class Settings {
 
     const FIELD_SELECTORS = 'field_selectors';
 
-    const SETUP_COMPLETED = 'setup_completed';
+    const SETUP_COMPLETED = 'cc_setup_completed';
 
     const DO_TOKEN = 'do_token';
 
@@ -65,7 +65,7 @@ class Settings {
      */
     public function add_menu() {
         add_options_page(
-                __( 'Correct Contact', 'correct-contact' ),
+                __( 'Correct Contact | Email Validation for WordPress', 'correct-contact' ),
                 __( 'Correct Contact', 'correct-contact' ),
                 'manage_options',
                 'correct-contact',
@@ -189,7 +189,7 @@ class Settings {
         wp_add_inline_script( 'select2', "
 			document.addEventListener('DOMContentLoaded', function() {
                 if (typeof jQuery !== 'undefined') {
-                    jQuery('#cc_field_selectors').select2({
+                    jQuery('#field_selectors').select2({
                         tags: true,
                         tokenSeparators: [',', ' '],
                         placeholder: '" . __( 'Add selectors...', 'correct-contact' ) . "'
@@ -240,31 +240,37 @@ class Settings {
      * Sanitize all settings.
      */
     public function sanitize( $input ) {
+        // Get existing options to merge with new input
+        $existing = get_option( self::OPTION_NAME, [] );
+
+        // Merge existing options with new input to preserve settings from other tabs
+        $output = is_array( $existing ) ? $existing : [];
+
         if ( isset( $input[ self::FIELD_SELECTORS ] ) ) {
-            $input[ self::FIELD_SELECTORS ] = $this->sanitize_selectors( $input[ self::FIELD_SELECTORS ] );
+            $output[ self::FIELD_SELECTORS ] = $this->sanitize_selectors( $input[ self::FIELD_SELECTORS ] );
         }
 
         if ( isset( $input[ self::ACCESS_TOKEN ] ) ) {
-            $input[ self::ACCESS_TOKEN ] = sanitize_text_field( $input[ self::ACCESS_TOKEN ] );
+            $output[ self::ACCESS_TOKEN ] = sanitize_text_field( $input[ self::ACCESS_TOKEN ] );
         }
 
         if ( isset( $input[ self::APP_URL ] ) ) {
-            $input[ self::APP_URL ] = esc_url_raw( $input[ self::APP_URL ] );
+            $output[ self::APP_URL ] = esc_url_raw( $input[ self::APP_URL ] );
         }
 
         if ( isset( $input[ self::DO_TOKEN ] ) ) {
-            $input[ self::DO_TOKEN ] = sanitize_text_field( $input[ self::DO_TOKEN ] );
+            $output[ self::DO_TOKEN ] = sanitize_text_field( $input[ self::DO_TOKEN ] );
         }
 
         if ( isset( $input[ self::REGION ] ) ) {
-            $input[ self::REGION ] = sanitize_text_field( $input[ self::REGION ] );
+            $output[ self::REGION ] = sanitize_text_field( $input[ self::REGION ] );
         }
 
         if ( isset( $input[ self::BLOCK_PURCHASE ] ) ) {
-            $input[ self::BLOCK_PURCHASE ] = (int) $input[ self::BLOCK_PURCHASE ];
+            $output[ self::BLOCK_PURCHASE ] = (int) $input[ self::BLOCK_PURCHASE ];
         }
 
-        return $input;
+        return $output;
     }
 
     /**
