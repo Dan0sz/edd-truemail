@@ -393,7 +393,6 @@
             const errorMessage = slide.querySelector('.cc-error-message');
             const errorActions = slide.querySelector('.cc-wizard-provision-error-actions');
             const progressFill = slide.querySelector('.cc-wizard-progress-fill');
-            const addPaymentBtn = slide.querySelector('.cc-add-payment');
             const stepsList = slide.querySelector('.cc-wizard-progress-steps');
 
             // Mark current step as error
@@ -416,10 +415,6 @@
             if (errorMessage) {
                 errorMessage.textContent = error.message || 'An error occurred during setup.';
                 errorMessage.style.display = 'block';
-            }
-
-            if (addPaymentBtn) {
-                addPaymentBtn.style.display = (error.code === 'payment_method_required') ? 'inline-block' : 'none';
             }
 
             if (errorActions) {

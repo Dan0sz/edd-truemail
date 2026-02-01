@@ -359,13 +359,6 @@ class Ajax {
 			wp_send_json_error( [ 'message' => __( 'The DigitalOcean API token does not have the required permissions (App Platform: read/write, Droplet: create/read, Project: create/read).', 'correct-contact' ) ] );
 		}
 		
-		if ( $code === 402 || ( isset( $body['id'] ) && $body['id'] === 'payment_required' ) ) {
-			wp_send_json_error( [
-				'message' => $body['message'] ?? __( 'Payment required.', 'correct-contact' ),
-				'code'    => 'payment_method_required',
-			] );
-		}
-		
 		if ( ! in_array( $code, [ 200, 201, 202 ] ) ) {
 			wp_send_json_error( [ 'message' => $body['message'] ?? __( 'API error.', 'correct-contact' ) ] );
 		}
