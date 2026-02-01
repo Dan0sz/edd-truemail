@@ -10,6 +10,7 @@
 
 namespace CorrectContact\Admin;
 
+use CorrectContact\Helper;
 use CorrectContact\Options;
 
 defined( 'ABSPATH' ) || exit;
@@ -169,7 +170,7 @@ class Settings {
         wp_enqueue_style( 'cc-admin', plugin_dir_url( CC_PLUGIN_FILE ) . 'assets/css/cc-admin.css', [], filemtime( plugin_dir_path( CC_PLUGIN_FILE ) . 'assets/css/cc-admin.css' ) );
 
         // If setup is not completed, enqueue wizard assets
-        if ( ! $this->is_setup_completed() ) {
+        if ( ! Helper::is_setup_completed() ) {
             wp_enqueue_style( 'cc-wizard', plugin_dir_url( CC_PLUGIN_FILE ) . 'assets/css/cc-wizard.css', [], filemtime( plugin_dir_path( CC_PLUGIN_FILE ) . 'assets/css/cc-wizard.css' ) );
             wp_enqueue_script( 'cc-wizard', plugin_dir_url( CC_PLUGIN_FILE ) . 'assets/js/cc-wizard.js', [], filemtime( plugin_dir_path( CC_PLUGIN_FILE ) . 'assets/js/cc-wizard.js' ), true );
 
@@ -196,15 +197,6 @@ class Settings {
                 }
 			});
 		" );
-    }
-
-    /**
-     * Check if setup wizard has been completed.
-     *
-     * @return bool
-     */
-    private function is_setup_completed() {
-        return (bool) get_option( self::SETUP_COMPLETED, false );
     }
 
     /**
@@ -291,7 +283,7 @@ class Settings {
      */
     public function render_settings_page() {
         // Show wizard if setup is not completed
-        if ( ! $this->is_setup_completed() ) {
+        if ( ! Helper::is_setup_completed() ) {
             $this->render_wizard();
 
             return;
