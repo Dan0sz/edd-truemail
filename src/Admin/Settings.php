@@ -480,7 +480,7 @@ class Settings {
                 <!-- Slide 4: Success -->
                 <div class="cc-wizard-slide" data-slide="4" style="display: none;">
                     <h2><?php esc_html_e( 'Your Truemail app is up and running!', 'correct-contact' ); ?></h2>
-                    <p><?php esc_html_e( 'Your email validation service is ready to validate email addresses in your forms.', 'correct-contact' ); ?></p>
+                    <p><?php esc_html_e( 'Your email validation service is now ready to validate email addresses in your forms.', 'correct-contact' ); ?></p>
                     <p><?php esc_html_e( 'CorrectContact is now connected to your Truemail app, running entirely in your own DigitalOcean account.', 'correct-contact' ); ?></p>
 
                     <h3><?php esc_html_e( 'You\'re in control.', 'correct-contact' ); ?></h3>
