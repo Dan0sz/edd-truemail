@@ -464,7 +464,7 @@ class Settings {
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="cc-wizard-actions">
                         <button type="button"
                                 class="button button-primary cc-wizard-provision"
@@ -480,25 +480,20 @@ class Settings {
                     <p><?php esc_html_e( 'Your email validation service is ready to validate email addresses in your forms.', 'correct-contact' ); ?></p>
                     <p><?php esc_html_e( 'CorrectContact is now connected to your Truemail app, running entirely in your own DigitalOcean account.', 'correct-contact' ); ?></p>
 
-                    <div class="cc-callout cc-callout-success">
-                        <h3><?php esc_html_e( 'You\'re in control.', 'correct-contact' ); ?></h3>
-                        <ul>
-                            <li><?php esc_html_e( 'The app runs entirely in your DigitalOcean account', 'correct-contact' ); ?></li>
-                            <li><?php esc_html_e( 'No third-party email validation services are used', 'correct-contact' ); ?></li>
-                            <li><?php esc_html_e( 'CorrectContact does not process or store email addresses', 'correct-contact' ); ?></li>
-                        </ul>
-                    </div>
+                    <h3><?php esc_html_e( 'You\'re in control.', 'correct-contact' ); ?></h3>
+                    <ul>
+                        <li><?php esc_html_e( 'The app runs entirely in your DigitalOcean account', 'correct-contact' ); ?></li>
+                        <li><?php esc_html_e( 'No third-party email validation services are used', 'correct-contact' ); ?></li>
+                        <li><?php esc_html_e( 'CorrectContact does not process or store email addresses', 'correct-contact' ); ?></li>
+                    </ul>
 
-                    <h3><?php esc_html_e( 'API token cleanup', 'correct-contact' ); ?></h3>
                     <p><?php esc_html_e( 'CorrectContact no longer needs your DigitalOcean API token. You can safely remove it now.', 'correct-contact' ); ?></p>
-                    <p>
-                        <button type="button"
-                                class="button button-secondary cc-wizard-remove-token"><?php esc_html_e( 'Remove API token', 'correct-contact' ); ?></button>
-                    </p>
 
                     <div class="cc-wizard-actions">
                         <button type="button"
                                 class="button button-primary cc-wizard-complete"><?php esc_html_e( 'Continue to settings', 'correct-contact' ); ?></button>
+                        <button type="button"
+                                class="button button-secondary cc-wizard-remove-token"><?php esc_html_e( 'Remove API token', 'correct-contact' ); ?></button>
                     </div>
                 </div>
             </div>
