@@ -184,7 +184,7 @@ class Ajax {
 						'Content-Type'  => 'application/json',
 					],
 					'body'    => json_encode( [
-						'spec' => [
+						'spec'       => [
 							'name'     => $name,
 							'region'   => $region,
 							'services' => [
@@ -192,7 +192,7 @@ class Ajax {
 									'name'               => 'truemail',
 									'http_port'          => 8080,
 									'instance_count'     => 1,
-									'instance_size_slug' => 'basic-s', // $10/month, 1GB RAM, 1 vCPU
+									'instance_size_slug' => 'basic-xs', // $10/month, 1GB RAM, 1 vCPU
 									'dockerfile_path'    => 'Dockerfile',
 									'git'                => [
 										'repo_clone_url' => 'https://github.com/Dan0sz/truemail-rack-docker-image.git',
@@ -218,6 +218,7 @@ class Ajax {
 								],
 							],
 						],
+						'project_id' => $project_id,
 					] ),
 				] );
 				
