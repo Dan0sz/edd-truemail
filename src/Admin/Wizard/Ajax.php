@@ -253,8 +253,8 @@ class Ajax {
 				$this->handle_api_response( $response, 'app' );
 				break;
 			
-			case 'install':
-				// Step "install" checks deployment status
+			case 'deploy':
+				// Step "deploy" checks deployment status
 				if ( empty( $app_id ) ) {
 					wp_send_json_error( [ 'message' => __( 'App ID is missing.', 'correct-contact' ) ] );
 				}
@@ -273,13 +273,13 @@ class Ajax {
 				$deployment = $body['deployments'][0] ?? null;
 				
 				if ( $deployment && $deployment['phase'] === 'ACTIVE' ) {
-					wp_send_json_success( [ 'step' => 'install' ] );
+					wp_send_json_success( [ 'step' => 'deploy' ] );
 				} elseif ( $deployment && in_array( $deployment['phase'], [ 'ERROR', 'CANCELED' ] ) ) {
 					wp_send_json_error( [ 'message' => __( 'Deployment failed.', 'correct-contact' ) ] );
 				} else {
 					// Still deploying, keep the UI waiting
 					sleep( 2 );
-					wp_send_json_success( [ 'step' => 'install', 'retry' => true ] );
+					wp_send_json_success( [ 'step' => 'deploy', 'retry' => true ] );
 				}
 				break;
 			

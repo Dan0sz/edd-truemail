@@ -453,7 +453,7 @@ class Settings {
                             <ul class="cc-wizard-progress-steps">
                                 <li data-step="project"><?php esc_html_e( 'Creating project', 'correct-contact' ); ?></li>
                                 <li data-step="app"><?php esc_html_e( 'Creating app', 'correct-contact' ); ?></li>
-                                <li data-step="install"><?php esc_html_e( 'Deploying Truemail', 'correct-contact' ); ?></li>
+                                <li data-step="deploy"><?php esc_html_e( 'Deploying Truemail', 'correct-contact' ); ?></li>
                                 <li data-step="finalize"><?php esc_html_e( 'Finalizing configuration', 'correct-contact' ); ?></li>
                                 <li data-step="done"><?php esc_html_e( 'Done!', 'correct-contact' ); ?></li>
                             </ul>
