@@ -288,7 +288,7 @@
 
         provisionServer: function () {
             const self = this;
-            const steps = ['project', 'server', 'install', 'secure', 'done'];
+            const steps = ['project', 'app', 'install', 'secure', 'done'];
 
             const updateProgress = (stepIndex) => {
                 const stepElements = document.querySelectorAll('.cc-wizard-progress-steps li');

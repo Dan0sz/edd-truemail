@@ -171,7 +171,7 @@ class Ajax {
 				$this->handle_api_response( $response, 'project' );
 				break;
 			
-			case 'server':
+			case 'app':
 				$name         = __( 'correct-contact', 'correct-contact' );
 				$access_token = wp_generate_password( 32, false, false );
 				$admin_email  = get_option( 'admin_email' );
@@ -193,7 +193,7 @@ class Ajax {
 									'instance_size_slug' => 'basic-s', // $10/month, 1GB RAM, 1 vCPU
 									'dockerfile_path'    => 'Dockerfile',
 									'git'                => [
-										'repo_clone_url' => 'https://github.com/Dan0sz/truemail-rack-docker-image',
+										'repo_clone_url' => 'https://github.com/Dan0sz/truemail-rack-docker-image.git',
 										'branch'         => 'master',
 									],
 									'envs'               => [
@@ -234,7 +234,7 @@ class Ajax {
 						if ( ! empty( $apps_body['apps'] ) ) {
 							foreach ( $apps_body['apps'] as $app ) {
 								if ( $app['spec']['name'] === $name ) {
-									wp_send_json_success( [ 'step' => 'server', 'app_id' => $app['id'] ] );
+									wp_send_json_success( [ 'step' => 'app', 'app_id' => $app['id'] ] );
 									
 									exit;
 								}
@@ -247,7 +247,7 @@ class Ajax {
 				Options::update( Settings::ACCESS_TOKEN, $access_token );
 				Options::update( Settings::REGION, $region );
 				
-				$this->handle_api_response( $response, 'server' );
+				$this->handle_api_response( $response, 'app' );
 				break;
 			
 			case 'install':
@@ -370,7 +370,7 @@ class Ajax {
 			return;
 		}
 		
-		if ( $step === 'server' ) {
+		if ( $step === 'app' ) {
 			wp_send_json_success( [ 'step' => $step, 'app_id' => $body['app']['id'] ] );
 			
 			return;
