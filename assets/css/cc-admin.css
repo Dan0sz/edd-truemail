@@ -28,7 +28,16 @@
 }
 
 .cc-admin ul, .cc-admin ol {
+    margin-left: 1rem;
+}
+
+.cc-admin ul {
     list-style: initial;
+}
+
+.cc-admin li > ul,
+.cc-admin li > ol {
+    margin: .25rem 1rem;
 }
 
 .cc-admin h1 {

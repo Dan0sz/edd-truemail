@@ -17,19 +17,19 @@ defined( 'ABSPATH' ) || exit;
 class Settings {
     const OPTION_NAME = Options::OPTION_NAME;
 
-    const ACCESS_TOKEN = 'cc_access_token';
+    const ACCESS_TOKEN = 'access_token';
 
-    const APP_URL = 'cc_app_url';
+    const APP_URL = 'app_url';
 
-    const BLOCK_PURCHASE = 'cc_block_checkout';
+    const BLOCK_PURCHASE = 'block_checkout';
 
-    const FIELD_SELECTORS = 'cc_field_selectors';
+    const FIELD_SELECTORS = 'field_selectors';
 
-    const SETUP_COMPLETED = 'cc_setup_completed';
+    const SETUP_COMPLETED = 'setup_completed';
 
-    const DO_TOKEN = 'cc_do_token';
+    const DO_TOKEN = 'do_token';
 
-    const REGION = 'cc_region';
+    const REGION = 'region';
 
     const SETTINGS_FIELD_GENERAL = 'cc-general-settings';
 
@@ -363,8 +363,7 @@ class Settings {
                 <div class="cc-wizard-slide" data-slide="1" style="display: none;">
                     <h2><?php esc_html_e( 'Create your DigitalOcean account', 'correct-contact' ); ?></h2>
                     <p><?php esc_html_e( 'To run the email validation service, CorrectContact uses a small server in your own DigitalOcean account.', 'correct-contact' ); ?></p>
-                    <p><?php esc_html_e( 'If you don\'t have a DigitalOcean account yet, create one now.', 'correct-contact' ); ?></p>
-                    <p><?php esc_html_e( 'If you already have an account, you can continue to the next step.', 'correct-contact' ); ?></p>
+                    <p><?php esc_html_e( 'If you don\'t have a DigitalOcean account yet, create one by clicking the button below. If you\'re all set, continue to the next step.', 'correct-contact' ); ?></p>
 
                     <div class="cc-notice info">
                         <h3><?php esc_html_e( 'New to DigitalOcean?', 'correct-contact' ); ?></h3>
@@ -396,11 +395,10 @@ class Settings {
                             <?php esc_html_e( 'Set the Token Name to "Correct Contact". You can leave the Expiration and Scopes setting to their defaults.', 'correct-contact' ); ?>
                         </li>
                         <li>
-                            <?php esc_html_e( 'Make sure the token has the following scopes/permissions:', 'correct-contact' ); ?>
+                            <?php esc_html_e( 'Make sure the token has the following scopes or, permissions:', 'correct-contact' ); ?>
                             <ul>
-                                <li><?php esc_html_e( 'App: create/read', 'correct-contact' ); ?></li>
-                                <li><?php esc_html_e( 'Droplet: create/read', 'correct-contact' ); ?></li>
-                                <li><?php esc_html_e( 'Project: create/read', 'correct-contact' ); ?></li>
+                                <li><?php echo wp_kses_post( __( '<strong>App:</strong> create/read', 'correct-contact' ) ); ?></li>
+                                <li><?php echo wp_kses_post( __( '<strong>Project:</strong> create/read', 'correct-contact' ) ); ?></li>
                             </ul>
                         </li>
                         <li>
@@ -456,7 +454,7 @@ class Settings {
                                 <li data-step="project"><?php esc_html_e( 'Creating project', 'correct-contact' ); ?></li>
                                 <li data-step="app"><?php esc_html_e( 'Creating app', 'correct-contact' ); ?></li>
                                 <li data-step="install"><?php esc_html_e( 'Deploying Truemail', 'correct-contact' ); ?></li>
-                                <li data-step="secure"><?php esc_html_e( 'Finalizing configuration', 'correct-contact' ); ?></li>
+                                <li data-step="finalize"><?php esc_html_e( 'Finalizing configuration', 'correct-contact' ); ?></li>
                                 <li data-step="done"><?php esc_html_e( 'Done!', 'correct-contact' ); ?></li>
                             </ul>
                             <p class="cc-error-message" style="display: none;"></p>

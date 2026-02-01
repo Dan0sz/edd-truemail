@@ -131,6 +131,7 @@ class Ajax {
 		
 		switch ( $step ) {
 			case 'project':
+				// Create Project
 				$domain       = str_replace( [ 'http://', 'https://' ], '', get_home_url() );
 				$project_name = str_replace( '.', '-', $domain );
 				
@@ -140,8 +141,9 @@ class Ajax {
 						'Content-Type'  => 'application/json',
 					],
 					'body'    => json_encode( [
-						'name'    => $project_name,
-						'purpose' => 'Web Application',
+						'name'        => $project_name,
+						'environment' => 'Production',
+						'purpose'     => 'Service or API',
 					] ),
 				] );
 				
@@ -172,6 +174,7 @@ class Ajax {
 				break;
 			
 			case 'app':
+				// Create App
 				$name         = __( 'correct-contact', 'correct-contact' );
 				$access_token = wp_generate_password( 32, false, false );
 				$admin_email  = get_option( 'admin_email' );
@@ -280,8 +283,8 @@ class Ajax {
 				}
 				break;
 			
-			case 'secure':
-				// Step "secure" retrieves the URL and attaches to project
+			case 'finalize':
+				// Step "finalize" retrieves the URL and attaches to project
 				if ( empty( $app_id ) || empty( $project_id ) ) {
 					wp_send_json_error( [ 'message' => __( 'App ID or Project ID is missing.', 'correct-contact' ) ] );
 				}
@@ -318,15 +321,17 @@ class Ajax {
 				Options::update( Settings::APP_URL, $app_url );
 				
 				wp_send_json_success( [
-					'step' => 'secure'
+					'step' => 'finalize'
 				] );
 				
 				break;
 			case 'done':
+				// Done (colors the progress bar green.
 				wp_send_json_success( [ 'step' => 'done' ] );
 				
 				break;
 			default:
+				// If this happens, I've done something wrong.
 				wp_send_json_error( [ 'message' => __( 'Invalid step.', 'correct-contact' ) ] );
 		}
 	}
