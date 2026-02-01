@@ -371,10 +371,6 @@
                                     button.classList.remove('cc-wizard-provision');
                                     button.classList.add('cc-wizard-provision-complete');
                                 }
-
-                                setTimeout(() => {
-                                    self.saveCredentials();
-                                }, 1000);
                             }
                         } else {
                             self.handleProvisioningError(response.data, stepIndex);
@@ -457,33 +453,6 @@
 
             // Retry provisioning
             this.provisionServer();
-        },
-
-        saveCredentials: function () {
-            const self = this;
-
-            const formData = new FormData();
-            formData.append('action', 'cc_wizard_save_credentials');
-            formData.append('nonce', ccWizard.nonce);
-            formData.append('app_url', this.appUrl);
-            formData.append('access_token', this.accessToken);
-
-            fetch(ccWizard.ajaxUrl, {
-                method: 'POST',
-                body: formData
-            })
-                .then(response => response.json())
-                .then(response => {
-                    if (response.success) {
-                        // Move to success slide
-                        self.showSlide(4);
-                    } else {
-                        alert('Failed to save credentials. Please try again.');
-                    }
-                })
-                .catch(() => {
-                    alert('Failed to save credentials. Please try again.');
-                });
         },
 
         removeToken: function (e) {

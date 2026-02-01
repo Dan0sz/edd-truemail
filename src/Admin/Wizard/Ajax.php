@@ -23,7 +23,6 @@ class Ajax {
 		add_action( 'wp_ajax_cc_wizard_save_do_token', [ $this, 'ajax_wizard_save_do_token' ] );
 		add_action( 'wp_ajax_cc_wizard_fetch_regions', [ $this, 'ajax_wizard_fetch_regions' ] );
 		add_action( 'wp_ajax_cc_wizard_provision', [ $this, 'ajax_wizard_provision' ] );
-		add_action( 'wp_ajax_cc_wizard_save_credentials', [ $this, 'ajax_wizard_save_credentials' ] );
 		add_action( 'wp_ajax_cc_wizard_remove_token', [ $this, 'ajax_wizard_remove_token' ] );
 		add_action( 'wp_ajax_cc_wizard_complete', [ $this, 'ajax_wizard_complete' ] );
 	}
@@ -322,7 +321,7 @@ class Ajax {
 				Options::update( Settings::APP_URL, $app_url );
 				
 				wp_send_json_success( [
-					'step' => 'finalize'
+					'step' => 'finalize',
 				] );
 				
 				break;
@@ -386,30 +385,6 @@ class Ajax {
 	}
 	
 	/**
-	 * AJAX handler for saving wizard credentials.
-	 */
-	public function ajax_wizard_save_credentials() {
-		check_ajax_referer( 'cc_wizard_nonce', 'nonce' );
-		
-		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_send_json_error( [ 'message' => __( 'Insufficient permissions.', 'correct-contact' ) ] );
-		}
-		
-		$app_url      = isset( $_POST['app_url'] ) ? esc_url_raw( $_POST['app_url'] ) : '';
-		$access_token = isset( $_POST['access_token'] ) ? sanitize_text_field( $_POST['access_token'] ) : '';
-		
-		if ( empty( $app_url ) || empty( $access_token ) ) {
-			wp_send_json_error( [ 'message' => __( 'Missing credentials.', 'correct-contact' ) ] );
-		}
-		
-		// Save credentials
-		Options::update( Settings::APP_URL, $app_url );
-		Options::update( Settings::ACCESS_TOKEN, $access_token );
-		
-		wp_send_json_success();
-	}
-	
-	/**
 	 * AJAX handler for removing DigitalOcean API token.
 	 */
 	public function ajax_wizard_remove_token() {
@@ -420,11 +395,7 @@ class Ajax {
 		}
 		
 		// Remove DO token from options
-		$options = get_option( Settings::OPTION_NAME, [] );
-		if ( isset( $options[ Settings::DO_TOKEN ] ) ) {
-			unset( $options[ Settings::DO_TOKEN ] );
-			update_option( Settings::OPTION_NAME, $options );
-		}
+		Options::delete( Settings::DO_TOKEN );
 		
 		wp_send_json_success();
 	}
