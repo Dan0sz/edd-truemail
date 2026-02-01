@@ -26,10 +26,13 @@ class Options {
 	 */
 	public static function get( $key ) {
 		$defaults = [
+			Settings::DO_TOKEN        => '',
 			Settings::ACCESS_TOKEN    => '',
 			Settings::APP_URL         => '',
 			Settings::BLOCK_PURCHASE  => '',
 			Settings::FIELD_SELECTORS => '',
+			Settings::REGION          => '',
+			Settings::SETUP_COMPLETED => false,
 		];
 		$options  = get_option( self::OPTION_NAME, [] );
 		
