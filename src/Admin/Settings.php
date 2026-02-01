@@ -332,12 +332,12 @@ class Settings {
                 <!-- Slide 0: Intro -->
                 <div class="cc-wizard-slide" data-slide="0">
                     <h2><?php esc_html_e( 'Before we get started', 'correct-contact' ); ?></h2>
-                    <p><?php esc_html_e( 'CorrectContact runs on your own infrastructure. It does not use external email verification services.', 'correct-contact' ); ?></p>
-                    <p><?php esc_html_e( 'Instead, we\'re going to create a small server in your own DigitalOcean account.', 'correct-contact' ); ?></p>
+                    <p><?php esc_html_e( 'CorrectContact runs on your own infrastructure. It does not use third-party email verification services.', 'correct-contact' ); ?></p>
+                    <p><?php esc_html_e( 'Instead, we\'re going to create a small app in your own DigitalOcean account.', 'correct-contact' ); ?></p>
 
                     <h3><?php esc_html_e( 'Why DigitalOcean?', 'correct-contact' ); ?></h3>
                     <ul>
-                        <li><?php esc_html_e( 'Automatically create your own email validation server', 'correct-contact' ); ?></li>
+                        <li><?php esc_html_e( 'Automatically create your own email validation app', 'correct-contact' ); ?></li>
                         <li><?php esc_html_e( 'Unlimited email validations for a low, monthly fee', 'correct-contact' ); ?></li>
                         <li><?php esc_html_e( 'Reliable, EU-based infrastructure', 'correct-contact' ); ?></li>
                     </ul>
@@ -360,7 +360,7 @@ class Settings {
                 <!-- Slide 1: Create DigitalOcean account -->
                 <div class="cc-wizard-slide" data-slide="1" style="display: none;">
                     <h2><?php esc_html_e( 'Create your DigitalOcean account', 'correct-contact' ); ?></h2>
-                    <p><?php esc_html_e( 'To run the email validation service, CorrectContact uses a small server in your own DigitalOcean account.', 'correct-contact' ); ?></p>
+                    <p><?php esc_html_e( 'To run the email validation service, CorrectContact uses a small app in your own DigitalOcean account.', 'correct-contact' ); ?></p>
                     <p><?php esc_html_e( 'If you don\'t have a DigitalOcean account yet, create one by clicking the button below. If you\'re all set, continue to the next step.', 'correct-contact' ); ?></p>
 
                     <div class="cc-notice info">
@@ -376,34 +376,37 @@ class Settings {
                                 class="button button-secondary cc-wizard-next"><?php esc_html_e( 'I already have an account → Continue', 'correct-contact' ); ?></button>
                     </div>
 
-                    <p class="cc-wizard-footer"><?php esc_html_e( 'No server is created yet. You remain in full control of your account and infrastructure.', 'correct-contact' ); ?></p>
+                    <p class="cc-wizard-footer"><?php esc_html_e( 'No app is created yet. You remain in full control of your account and infrastructure.', 'correct-contact' ); ?></p>
                 </div>
 
                 <!-- Slide 2: Create API token -->
                 <div class="cc-wizard-slide" data-slide="2" style="display: none;">
                     <h2><?php esc_html_e( 'Create a DigitalOcean API token', 'correct-contact' ); ?></h2>
                     <p><?php esc_html_e( 'CorrectContact needs a DigitalOcean API token to create the email validation app for you.', 'correct-contact' ); ?></p>
-                    <p><?php wp_kses_post( 'This token is used <strong>only during setup</strong>. You will be prompted to remove it once the setup is complete.', 'correct-contact' ); ?></p>
+                    <p><?php echo wp_kses_post( __( 'This token is used <strong>only during setup</strong>. You will be prompted to remove it once the setup is complete.', 'correct-contact' ) ); ?></p>
+                    <div class="cc-notice info">
+                        <p><?php echo wp_kses_post( __( 'DigitalOcean may ask you to <strong>add a payment method</strong> when generating the API token. No charges are made at this stage. The email validation app is only created in the next step.', 'correct-contact' ) ); ?></p>
+                    </div>
                     <p><?php esc_html_e( 'To create the API token, follow these steps', 'correct-contact' ); ?>:</p>
                     <ol>
                         <li><a href="https://cloud.digitalocean.com/account/api/tokens/new"
                                target="_blank"><?php esc_html_e( 'Click here to start creating a new API token', 'correct-contact' ); ?></a>
                         </li>
                         <li>
-                            <?php esc_html_e( 'Set the Token Name to "Correct Contact". You can leave the Expiration and Scopes setting to their defaults.', 'correct-contact' ); ?>
+                            <?php echo wp_kses_post( __( 'Set the <strong>Token Name</strong> to <code>Correct Contact</code>. You can leave the Expiration and Scopes setting to their defaults.', 'correct-contact' ) ); ?>
                         </li>
                         <li>
-                            <?php esc_html_e( 'Make sure the token has the following scopes or, permissions:', 'correct-contact' ); ?>
+                            <?php echo wp_kses_post( __( 'Make sure the token has the following <strong>Scopes</strong>, i.e. permissions:', 'correct-contact' ) ); ?>
                             <ul>
-                                <li><?php echo wp_kses_post( __( '<strong>App:</strong> create/read', 'correct-contact' ) ); ?></li>
-                                <li><?php echo wp_kses_post( __( '<strong>Project:</strong> create/read/update', 'correct-contact' ) ); ?></li>
+                                <li><?php echo wp_kses_post( __( '<strong>App:</strong> select <code>create</code> and <code>read</code>', 'correct-contact' ) ); ?></li>
+                                <li><?php echo wp_kses_post( __( '<strong>Project:</strong> select <code>create</code>, <code>read</code> and <code>update</code>', 'correct-contact' ) ); ?></li>
                             </ul>
                         </li>
                         <li>
-                            <?php esc_html_e( 'Click "Generate Token"', 'correct-contact' ); ?>
+                            <?php echo wp_kses_post( __( 'Click <strong>Generate Token</strong>. You will be prompted to <strong>Add a Payment Method</strong>, if you haven\'t yet.', 'correct-contact' ) ); ?>
                         </li>
                         <li>
-                            <?php esc_html_e( 'Copy the token and paste it in the field below.', 'correct-contact' ); ?>
+                            <?php echo wp_kses_post( __( '<strong>Copy</strong> the generated token and <strong>paste</strong> it in the field below.', 'correct-contact' ) ); ?>
                         </li>
                     </ol>
                     <p>
@@ -423,18 +426,20 @@ class Settings {
                 <!-- Slide 3: Create app -->
                 <div class="cc-wizard-slide" data-slide="3" style="display: none;">
                     <h2><?php esc_html_e( 'Create your email validation app', 'correct-contact' ); ?></h2>
-                    <p><?php esc_html_e( 'Once you click Create app, CorrectContact will set up your email validation service.', 'correct-contact' ); ?></p>
-                    <p><?php esc_html_e( 'A small app, called Truemail, will be installed on a DigitalOcean droplet in your account. This app is responsible for validating email addresses in real time.', 'correct-contact' ); ?></p>
-                    <p><?php esc_html_e( 'The app runs on a basic server costing $10 per month, billed directly by DigitalOcean. Truemail is a lightweight email validation service, and this setup is sufficient for most websites. If you need more processing power or bandwidth, you can upgrade the server later.', 'correct-contact' ); ?></p>
+                    <p><?php echo wp_kses_post( __( 'Once you click <strong>Create app</strong>, CorrectContact will set up your email validation service in your DigitalOcean account.', 'correct-contact' ) ); ?></p>
+                    <p><?php esc_html_e( 'A lightweight email validation service called Truemail will be installed as a DigitalOcean app in your account. It validates email addresses in real time.', 'correct-contact' ); ?></p>
+                    <div class="cc-notice info">
+                        <p><?php echo wp_kses_post( __( 'The app runs on a basic server which costs <strong>$10 per month</strong>, billed directly by DigitalOcean. This setup is sufficient for most websites. You can upgrade the server later if you need more processing power or bandwidth.', 'correct-contact' ) ); ?></p>
+                    </div>
                     <p><?php esc_html_e( 'CorrectContact does not charge for infrastructure and does not add any markup.', 'correct-contact' ); ?></p>
 
                     <div class="cc-wizard-provision-content">
-                        <p>
-                            <label for="cc-region"><?php esc_html_e( 'Select datacenter region:', 'correct-contact' ); ?></label><br>
+                        <label for="cc-region"><strong><?php esc_html_e( 'Select datacenter region:', 'correct-contact' ); ?></strong>
                             <select id="cc-region" class="regular-text">
                                 <option value=""><?php esc_html_e( 'Loading regions...', 'correct-contact' ); ?></option>
                             </select>
-                        </p>
+                        </label>
+                        <p class="description"><?php esc_html_e( 'This determines where the app will run.', 'correct-contact' ); ?></p>
                     </div>
 
                     <div class="cc-wizard-provision-controls">
@@ -469,7 +474,7 @@ class Settings {
                                 disabled><?php esc_html_e( 'Create app', 'correct-contact' ); ?></button>
                     </div>
 
-                    <p class="cc-wizard-footer"><?php esc_html_e( 'This will only take a few minutes', 'correct-contact' ); ?></p>
+                    <p class="cc-wizard-footer"><?php esc_html_e( 'This usually takes a few minutes.', 'correct-contact' ); ?></p>
                 </div>
 
                 <!-- Slide 4: Success -->

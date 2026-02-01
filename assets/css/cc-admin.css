@@ -23,7 +23,7 @@
     max-width: 1350px;
 }
 
-.cc-admin p, .cc-admin ul, .cc-admin ol {
+.cc-admin p, .cc-admin label, .cc-admin ul, .cc-admin ol {
     font-size: 14px;
 }
 
