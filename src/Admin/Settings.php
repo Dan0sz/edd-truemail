@@ -396,7 +396,7 @@ class Settings {
                             <?php esc_html_e( 'Make sure the token has the following scopes or, permissions:', 'correct-contact' ); ?>
                             <ul>
                                 <li><?php echo wp_kses_post( __( '<strong>App:</strong> create/read', 'correct-contact' ) ); ?></li>
-                                <li><?php echo wp_kses_post( __( '<strong>Project:</strong> create/read', 'correct-contact' ) ); ?></li>
+                                <li><?php echo wp_kses_post( __( '<strong>Project:</strong> create/read/update', 'correct-contact' ) ); ?></li>
                             </ul>
                         </li>
                         <li>
