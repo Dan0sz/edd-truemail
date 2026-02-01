@@ -413,8 +413,6 @@ class Ajax {
 		// Mark setup as completed
 		Options::update( Settings::SETUP_COMPLETED, true );
 		
-		delete_option( Settings::DO_TOKEN );
-		
 		wp_send_json_success();
 	}
 }
