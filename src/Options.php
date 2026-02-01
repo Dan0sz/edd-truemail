@@ -27,10 +27,10 @@ class Options {
 	public static function get( $key ) {
 		$defaults = [
 			Settings::DO_TOKEN        => '',
+			Settings::FIELD_SELECTORS => 'input[type="email"]',
+			Settings::BLOCK_PURCHASE  => '',
 			Settings::ACCESS_TOKEN    => '',
 			Settings::APP_URL         => '',
-			Settings::BLOCK_PURCHASE  => '',
-			Settings::FIELD_SELECTORS => '',
 			Settings::REGION          => '',
 		];
 		$options  = get_option( self::OPTION_NAME, [] );
