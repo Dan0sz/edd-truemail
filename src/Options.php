@@ -54,4 +54,23 @@ class Options {
 		
 		return update_option( self::OPTION_NAME, $options );
 	}
+	
+	/**
+	 * Delete a single setting from the options array.
+	 *
+	 * @param string $key
+	 *
+	 * @return bool
+	 */
+	public static function delete( $key ) {
+		$options = get_option( self::OPTION_NAME, [] );
+		
+		if ( isset( $options[ $key ] ) ) {
+			unset( $options[ $key ] );
+			
+			return update_option( self::OPTION_NAME, $options );
+		}
+		
+		return false;
+	}
 }
