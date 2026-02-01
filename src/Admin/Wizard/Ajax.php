@@ -411,7 +411,7 @@ class Ajax {
 		}
 		
 		// Mark setup as completed
-		Options::update( Settings::SETUP_COMPLETED, true );
+		update_option( Settings::SETUP_COMPLETED, true );
 		
 		wp_send_json_success();
 	}

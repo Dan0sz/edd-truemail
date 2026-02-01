@@ -21,6 +21,6 @@ class Helper {
 	 * @return bool
 	 */
 	public static function is_setup_completed() {
-		return (bool) Options::get( Settings::SETUP_COMPLETED );
+		return (bool) get_option( Settings::SETUP_COMPLETED, false );
 	}
 }
