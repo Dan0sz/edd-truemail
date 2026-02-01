@@ -119,14 +119,14 @@ class Settings {
         register_setting( self::SETTINGS_FIELD_GENERAL, self::OPTION_NAME, [
                 'sanitize_callback' => [
                         $this,
-                        'sanitize'
-                ]
+                        'sanitize',
+                ],
         ] );
         register_setting( self::SETTINGS_FIELD_ADVANCED, self::OPTION_NAME, [
                 'sanitize_callback' => [
                         $this,
-                        'sanitize'
-                ]
+                        'sanitize',
+                ],
         ] );
 
         // Add sections and fields for active tab
@@ -437,37 +437,41 @@ class Settings {
                                 <option value=""><?php esc_html_e( 'Loading regions...', 'correct-contact' ); ?></option>
                             </select>
                         </p>
-                        <div class="cc-wizard-actions">
-                            <button type="button"
-                                    class="button button-primary cc-wizard-provision"
-                                    disabled><?php esc_html_e( 'Create app', 'correct-contact' ); ?></button>
-                        </div>
-                        <p class="cc-wizard-footer"><?php esc_html_e( 'This will take 1–2 minutes', 'correct-contact' ); ?></p>
                     </div>
 
-                    <div class="cc-wizard-provision-progress" style="display: none;">
-                        <div class="cc-wizard-progress-bar">
-                            <div class="cc-wizard-progress-fill"></div>
-                        </div>
-                        <div class="cc-wizard-progress-status">
-                            <ul class="cc-wizard-progress-steps">
-                                <li data-step="project"><?php esc_html_e( 'Creating project', 'correct-contact' ); ?></li>
-                                <li data-step="app"><?php esc_html_e( 'Creating app', 'correct-contact' ); ?></li>
-                                <li data-step="deploy"><?php esc_html_e( 'Deploying Truemail', 'correct-contact' ); ?></li>
-                                <li data-step="finalize"><?php esc_html_e( 'Finalizing configuration', 'correct-contact' ); ?></li>
-                                <li data-step="done"><?php esc_html_e( 'Done!', 'correct-contact' ); ?></li>
-                            </ul>
-                            <p class="cc-error-message" style="display: none;"></p>
-                            <div class="cc-wizard-provision-error-actions" style="display: none;">
-                                <div class="cc-wizard-actions">
-                                    <a href="https://cloud.digitalocean.com/account/billing" target="_blank"
-                                       class="button button-secondary cc-add-payment"><?php esc_html_e( 'Add payment method', 'correct-contact' ); ?></a>
-                                    <button type="button"
-                                            class="button button-primary cc-wizard-retry"><?php esc_html_e( 'Retry setup', 'correct-contact' ); ?></button>
+                    <div class="cc-wizard-provision-controls">
+                        <div class="cc-wizard-provision-progress" style="display: none;">
+                            <div class="cc-wizard-progress-bar">
+                                <div class="cc-wizard-progress-fill"></div>
+                            </div>
+                            <div class="cc-wizard-progress-status">
+                                <ul class="cc-wizard-progress-steps">
+                                    <li data-step="project"><?php esc_html_e( 'Creating project', 'correct-contact' ); ?></li>
+                                    <li data-step="app"><?php esc_html_e( 'Creating app', 'correct-contact' ); ?></li>
+                                    <li data-step="deploy"><?php esc_html_e( 'Deploying Truemail', 'correct-contact' ); ?></li>
+                                    <li data-step="finalize"><?php esc_html_e( 'Finalizing configuration', 'correct-contact' ); ?></li>
+                                    <li data-step="done"><?php esc_html_e( 'Done!', 'correct-contact' ); ?></li>
+                                </ul>
+                                <p class="cc-error-message" style="display: none;"></p>
+                                <div class="cc-wizard-provision-error-actions" style="display: none;">
+                                    <div class="cc-wizard-actions">
+                                        <a href="https://cloud.digitalocean.com/account/billing" target="_blank"
+                                           class="button button-secondary cc-add-payment"><?php esc_html_e( 'Add payment method', 'correct-contact' ); ?></a>
+                                        <button type="button"
+                                                class="button button-primary cc-wizard-retry"><?php esc_html_e( 'Retry setup', 'correct-contact' ); ?></button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+                    
+                    <div class="cc-wizard-actions">
+                        <button type="button"
+                                class="button button-primary cc-wizard-provision"
+                                disabled><?php esc_html_e( 'Create app', 'correct-contact' ); ?></button>
+                    </div>
+
+                    <p class="cc-wizard-footer"><?php esc_html_e( 'This will only take a few minutes', 'correct-contact' ); ?></p>
                 </div>
 
                 <!-- Slide 4: Success -->

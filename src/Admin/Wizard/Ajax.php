@@ -171,8 +171,8 @@ class Ajax {
 				}
 				
 				$this->handle_api_response( $response, 'project' );
+				
 				break;
-			
 			case 'app':
 				// Create App
 				$name         = __( 'correct-contact', 'correct-contact' );
@@ -246,13 +246,13 @@ class Ajax {
 					}
 				}
 				
-				// Store the generated Truemail access token temporarily to retrieve later
+				// Store the Access Token in settings.
 				Options::update( Settings::ACCESS_TOKEN, $access_token );
 				Options::update( Settings::REGION, $region );
 				
 				$this->handle_api_response( $response, 'app' );
+				
 				break;
-			
 			case 'deploy':
 				// Step "deploy" checks deployment status
 				if ( empty( $app_id ) ) {
@@ -281,8 +281,8 @@ class Ajax {
 					sleep( 2 );
 					wp_send_json_success( [ 'step' => 'deploy', 'retry' => true ] );
 				}
+				
 				break;
-			
 			case 'finalize':
 				// Step "finalize" retrieves the URL and attaches to project
 				if ( empty( $app_id ) || empty( $project_id ) ) {
@@ -318,6 +318,7 @@ class Ajax {
 					wp_send_json_error( [ 'message' => __( 'Could not retrieve app URL.', 'correct-contact' ) ] );
 				}
 				
+				// Store the Application URL in settings.
 				Options::update( Settings::APP_URL, $app_url );
 				
 				wp_send_json_success( [
@@ -326,7 +327,7 @@ class Ajax {
 				
 				break;
 			case 'done':
-				// Done (colors the progress bar green.
+				// Done colors the progress bar green.
 				wp_send_json_success( [ 'step' => 'done' ] );
 				
 				break;

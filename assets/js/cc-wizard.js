@@ -60,6 +60,10 @@
                     this.createApp(e);
                 }
 
+                if (e.target.classList.contains('cc-wizard-provision-complete')) {
+                    this.nextSlide(e);
+                }
+
                 if (e.target.classList.contains('cc-wizard-remove-token')) {
                     this.removeToken(e);
                 }
@@ -262,8 +266,8 @@
             const content = slide.querySelector('.cc-wizard-provision-content');
             const progress = slide.querySelector('.cc-wizard-provision-progress');
 
-            // Hide button
-            button.style.display = 'none';
+            // Disable button and keep it visible
+            button.disabled = true;
 
             // Fade content, show progress
             if (content) {
@@ -272,7 +276,7 @@
                 setTimeout(() => {
                     content.style.display = 'none';
                     if (progress) {
-                        progress.style.display = 'flex';
+                        progress.style.display = 'block';
                         progress.style.opacity = '0';
                         setTimeout(() => {
                             progress.style.transition = 'opacity 0.3s';
@@ -358,6 +362,16 @@
                                 if (progressFill) {
                                     progressFill.classList.add('success');
                                 }
+
+                                // Re-enable button and change label to "Continue"
+                                const button = document.querySelector('.cc-wizard-provision');
+                                if (button) {
+                                    button.disabled = false;
+                                    button.textContent = 'Continue';
+                                    button.classList.remove('cc-wizard-provision');
+                                    button.classList.add('cc-wizard-provision-complete');
+                                }
+
                                 setTimeout(() => {
                                     self.saveCredentials();
                                 }, 1000);
