@@ -16,12 +16,30 @@ defined( 'ABSPATH' ) || exit;
 
 class Helper {
 	/**
-	 * Check if setup wizard has been completed.
+	 * Should we display the wizard?
+	 *
+	 * @return bool
+	 */
+	public static function should_display_wizard() {
+		return ! self::is_setup_completed() && ! self::is_setup_skipped();
+	}
+	
+	/**
+	 * Check if the setup wizard has been completed.
 	 *
 	 * @return bool
 	 */
 	public static function is_setup_completed() {
 		return (bool) get_option( Settings::SETUP_COMPLETED, false );
+	}
+	
+	/**
+	 * Check if the setup wizard has been completed.
+	 *
+	 * @return bool
+	 */
+	public static function is_setup_skipped() {
+		return (bool) get_option( Settings::SETUP_SKIPPED, false );
 	}
 	
 	/**

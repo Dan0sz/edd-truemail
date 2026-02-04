@@ -16,6 +16,7 @@ use CorrectContact\Options;
 defined( 'ABSPATH' ) || exit;
 
 class Ajax {
+	
 	/**
 	 * Ajax constructor.
 	 */
@@ -25,6 +26,8 @@ class Ajax {
 		add_action( 'wp_ajax_cc_wizard_provision', [ $this, 'ajax_wizard_provision' ] );
 		add_action( 'wp_ajax_cc_wizard_remove_token', [ $this, 'ajax_wizard_remove_token' ] );
 		add_action( 'wp_ajax_cc_wizard_complete', [ $this, 'ajax_wizard_complete' ] );
+		add_action( 'wp_ajax_cc_wizard_skip', [ $this, 'ajax_wizard_skip' ] );
+		add_action( 'wp_ajax_cc_wizard_restart', [ $this, 'ajax_wizard_restart' ] );
 	}
 	
 	/**
@@ -406,6 +409,39 @@ class Ajax {
 		
 		// Mark setup as completed
 		update_option( Settings::SETUP_COMPLETED, true );
+		
+		wp_send_json_success();
+	}
+	
+	/**
+	 * AJAX handler for skipping the wizard.
+	 */
+	public function ajax_wizard_skip() {
+		check_ajax_referer( 'cc_wizard_nonce', 'nonce' );
+		
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( [ 'message' => __( 'Insufficient permissions.', 'correct-contact' ) ] );
+		}
+		
+		// Mark wizard as skipped
+		update_option( Settings::SETUP_SKIPPED, true );
+		
+		wp_send_json_success();
+	}
+	
+	/**
+	 * AJAX handler for restarting the wizard.
+	 */
+	public function ajax_wizard_restart() {
+		check_ajax_referer( 'cc_wizard_nonce', 'nonce' );
+		
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( [ 'message' => __( 'Insufficient permissions.', 'correct-contact' ) ] );
+		}
+		
+		// Remove both setup options to restart the wizard
+		delete_option( Settings::SETUP_COMPLETED );
+		delete_option( Settings::SETUP_SKIPPED );
 		
 		wp_send_json_success();
 	}

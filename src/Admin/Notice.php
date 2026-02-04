@@ -26,7 +26,7 @@ class Notice {
      * Display admin notice if setup is not completed.
      */
     public function setup_notice() {
-        if ( Helper::is_setup_completed() ) {
+        if ( ! Helper::should_display_wizard() ) {
             return;
         }
 

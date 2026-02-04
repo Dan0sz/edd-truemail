@@ -52,6 +52,8 @@ use CorrectContact\Admin\Settings;
             <div class="cc-wizard-actions">
                 <button type="button"
                         class="button button-primary cc-wizard-next"><?php esc_html_e( 'Get started', 'correct-contact' ); ?></button>
+                <button type="button"
+                        class="button button-secondary cc-wizard-exit"><?php esc_html_e( 'I\'ll setup Truemail myself', 'correct-contact' ); ?></button>
             </div>
 
             <p class="cc-wizard-footer"><?php esc_html_e( 'You\'re in control at all times. CorrectContact only automates the setup.', 'correct-contact' ); ?></p>
@@ -93,20 +95,20 @@ use CorrectContact\Admin\Settings;
                        target="_blank"><?php esc_html_e( 'Click here to start creating a new API token', 'correct-contact' ); ?></a>
                 </li>
                 <li>
-					<?php echo wp_kses_post( __( 'Set the <strong>Token Name</strong> to <code>Correct Contact</code>. You can leave the Expiration and Scopes setting to their defaults.', 'correct-contact' ) ); ?>
+                    <?php echo wp_kses_post( __( 'Set the <strong>Token Name</strong> to <code>Correct Contact</code>. You can leave the Expiration and Scopes setting to their defaults.', 'correct-contact' ) ); ?>
                 </li>
                 <li>
-					<?php echo wp_kses_post( __( 'Make sure the token has the following <strong>Scopes</strong>, i.e. permissions:', 'correct-contact' ) ); ?>
+                    <?php echo wp_kses_post( __( 'Make sure the token has the following <strong>Scopes</strong>, i.e. permissions:', 'correct-contact' ) ); ?>
                     <ul>
                         <li><?php echo wp_kses_post( __( '<strong>App:</strong> select <code>create</code> and <code>read</code>', 'correct-contact' ) ); ?></li>
                         <li><?php echo wp_kses_post( __( '<strong>Project:</strong> select <code>create</code>, <code>read</code> and <code>update</code>', 'correct-contact' ) ); ?></li>
                     </ul>
                 </li>
                 <li>
-					<?php echo wp_kses_post( __( 'Click <strong>Generate Token</strong>. You will be prompted to <strong>Add a Payment Method</strong>, if you haven\'t yet.', 'correct-contact' ) ); ?>
+                    <?php echo wp_kses_post( __( 'Click <strong>Generate Token</strong>. You will be prompted to <strong>Add a Payment Method</strong>, if you haven\'t yet.', 'correct-contact' ) ); ?>
                 </li>
                 <li>
-					<?php echo wp_kses_post( __( '<strong>Copy</strong> the generated token and <strong>paste</strong> it in the field below.', 'correct-contact' ) ); ?>
+                    <?php echo wp_kses_post( __( '<strong>Copy</strong> the generated token and <strong>paste</strong> it in the field below.', 'correct-contact' ) ); ?>
                 </li>
             </ol>
             <p>
@@ -156,14 +158,6 @@ use CorrectContact\Admin\Settings;
                             <li data-step="done"><?php esc_html_e( 'Done!', 'correct-contact' ); ?></li>
                         </ul>
                         <p class="cc-error-message" style="display: none;"></p>
-                        <div class="cc-wizard-provision-error-actions" style="display: none;">
-                            <div class="cc-wizard-actions">
-                                <a href="https://cloud.digitalocean.com/account/billing" target="_blank"
-                                   class="button button-secondary cc-add-payment"><?php esc_html_e( 'Add payment method', 'correct-contact' ); ?></a>
-                                <button type="button"
-                                        class="button button-primary cc-wizard-retry"><?php esc_html_e( 'Retry setup', 'correct-contact' ); ?></button>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>

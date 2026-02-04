@@ -72,8 +72,8 @@
                     this.completeWizard(e);
                 }
 
-                if (e.target.classList.contains('cc-wizard-retry')) {
-                    this.retryProvisioning(e);
+                if (e.target.classList.contains('cc-wizard-exit')) {
+                    this.skipWizard(e);
                 }
             });
 
@@ -422,100 +422,75 @@
             }
         },
 
-        retryProvisioning: function (e) {
+        /**
+         * Generic handler for wizard AJAX actions.
+         *
+         * @param {Event} e - The event object
+         * @param {Object} config - Configuration object
+         * @param {string} config.action - The AJAX action name
+         * @param {string} config.loadingText - Text to display while loading
+         * @param {Function} config.onSuccess - Callback function on success
+         */
+        handleWizardAction: function (e, config) {
             e.preventDefault();
 
-            const slide = document.querySelector('.cc-wizard-slide[data-slide="3"]');
-            const stepsList = slide.querySelector('.cc-wizard-progress-steps');
-            const errorMessage = slide.querySelector('.cc-error-message');
-            const errorActions = slide.querySelector('.cc-wizard-provision-error-actions');
-            const progressFill = slide.querySelector('.cc-wizard-progress-fill');
+            const button = e.target;
+            button.disabled = true;
+            const originalText = button.textContent;
+            button.textContent = config.loadingText;
 
-            // Reset UI
-            if (progressFill) {
-                progressFill.style.width = '0%';
-                progressFill.classList.remove('error', 'success');
-            }
-            if (stepsList) {
-                stepsList.style.display = 'block';
-            }
-            if (errorMessage) {
-                errorMessage.style.display = 'none';
-            }
-            if (errorActions) {
-                errorActions.style.display = 'none';
-            }
+            const formData = new FormData();
+            formData.append('action', config.action);
+            formData.append('nonce', ccWizard.nonce);
 
-            // Retry provisioning
-            this.provisionServer();
+            fetch(ccWizard.ajaxUrl, {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(response => {
+                    if (response.success) {
+                        config.onSuccess(button);
+                    } else {
+                        button.disabled = false;
+                        button.textContent = originalText;
+                    }
+                })
+                .catch(() => {
+                    button.disabled = false;
+                    button.textContent = originalText;
+                });
         },
 
         removeToken: function (e) {
-            e.preventDefault();
-
-            const button = e.target;
-            button.disabled = true;
-            const originalText = button.textContent;
-            button.textContent = 'Removing...';
-
-            const formData = new FormData();
-            formData.append('action', 'cc_wizard_remove_token');
-            formData.append('nonce', ccWizard.nonce);
-
-            fetch(ccWizard.ajaxUrl, {
-                method: 'POST',
-                body: formData
-            })
-                .then(response => response.json())
-                .then(response => {
-                    if (response.success) {
-                        button.textContent = 'Token removed';
-                        button.classList.add('button-disabled');
-                    } else {
-                        button.disabled = false;
-                        button.textContent = originalText;
-                        alert('Failed to remove token. Please try again.');
-                    }
-                })
-                .catch(() => {
-                    button.disabled = false;
-                    button.textContent = originalText;
-                    alert('Failed to remove token. Please try again.');
-                });
+            this.handleWizardAction(e, {
+                action: 'cc_wizard_remove_token',
+                loadingText: ccWizard.removingText,
+                onSuccess: (button) => {
+                    button.textContent = ccWizard.tokenRemovedText;
+                    button.classList.add('button-disabled');
+                }
+            });
         },
 
         completeWizard: function (e) {
-            e.preventDefault();
+            this.handleWizardAction(e, {
+                action: 'cc_wizard_complete',
+                loadingText: ccWizard.completingText,
+                onSuccess: () => {
+                    window.location.reload();
+                }
+            });
+        },
 
-            const button = e.target;
-            button.disabled = true;
-            const originalText = button.textContent;
-            button.textContent = 'Completing...';
-
-            const formData = new FormData();
-            formData.append('action', 'cc_wizard_complete');
-            formData.append('nonce', ccWizard.nonce);
-
-            fetch(ccWizard.ajaxUrl, {
-                method: 'POST',
-                body: formData
-            })
-                .then(response => response.json())
-                .then(response => {
-                    if (response.success) {
-                        // Reload page to show settings
-                        window.location.reload();
-                    } else {
-                        button.disabled = false;
-                        button.textContent = originalText;
-                        alert('Failed to complete setup. Please try again.');
-                    }
-                })
-                .catch(() => {
-                    button.disabled = false;
-                    button.textContent = originalText;
-                    alert('Failed to complete setup. Please try again.');
-                });
+        skipWizard: function (e) {
+            this.handleWizardAction(e, {
+                action: 'cc_wizard_skip',
+                loadingText: ccWizard.redirectingText,
+                onSuccess: () => {
+                    window.location.href = window.location.pathname + '?page=correct-contact&tab=cc-advanced-settings';
+                }
+            });
         }
     };
 

@@ -26,8 +26,6 @@ class Settings {
 
     const FIELD_SELECTORS = 'field_selectors';
 
-    const SETUP_COMPLETED = 'cc_setup_completed';
-
     const DO_TOKEN = 'do_token';
 
     const REGION = 'region';
@@ -35,6 +33,10 @@ class Settings {
     const SETTINGS_FIELD_GENERAL = 'cc-general-settings';
 
     const SETTINGS_FIELD_ADVANCED = 'cc-advanced-settings';
+
+    const SETUP_COMPLETED = 'cc_setup_completed';
+
+    const SETUP_SKIPPED = 'cc_setup_skipped';
 
     /** @var string */
     private $active_tab = '';
@@ -99,52 +101,55 @@ class Settings {
                 self::SETTINGS_FIELD_ADVANCED => [
                         'section_id'    => 'cc_advanced_section',
                         'section_title' => __( 'Advanced Settings', 'correct-contact' ),
+                        'intro'         => '<p>' . __( 'CorrectContact validates email addresses using a Truemail service.', 'correct-contact' ) . '</p><p>' . __( 'For most users, this service is created automatically during setup.', 'correct-contact' ) . ' ' . __( 'Advanced users can configure a custom Truemail server here.', 'correct-contact' ) . '</p>',
                         'settings'      => [
-                                self::ACCESS_TOKEN => [
+                                self::ACCESS_TOKEN  => [
                                         'label'             => __( 'Access Token', 'correct-contact' ),
                                         'callback'          => [ $this, 'render_text_field' ],
                                         'desc'              => __( 'Enter the Access Token (environment variable) you\'ve configured in your Truemail instance here.', 'correct-contact' ),
                                         'sanitize_callback' => null,
                                 ],
-                                self::APP_URL      => [
+                                self::APP_URL       => [
                                         'label'             => __( 'Application URL', 'correct-contact' ),
                                         'callback'          => [ $this, 'render_text_field' ],
                                         'desc'              => __( 'Enter the URL of your Truemail instance here.', 'correct-contact' ),
                                         'sanitize_callback' => null,
+                                ],
+                                'app_url_interlude' => [
+                                        'callback' => [ $this, 'render_interlude_field' ],
+                                        'desc'     => '<p><strong>' . __( 'Don\'t have a Truemail server yet?', 'correct-contact' ) . '</strong></p><ul><li><a href="#" class="cc-wizard-restart">' .
+                                                      __( 'Follow the wizard', 'correct-contact' ) . '</a> ' . __( 'to create one automatically, or', 'correct-contact' ) . '</li><li><a href="#" 
+        target="_blank">' . __( 'Set one up yourself', 'correct-contact' ) . '</a>.</li></ul>',
                                 ],
                         ],
                 ],
         ];
 
         // Register all settings
-        register_setting( self::SETTINGS_FIELD_GENERAL, self::OPTION_NAME, [
-                'sanitize_callback' => [
-                        $this,
-                        'sanitize',
-                ],
-        ] );
-        register_setting( self::SETTINGS_FIELD_ADVANCED, self::OPTION_NAME, [
-                'sanitize_callback' => [
-                        $this,
-                        'sanitize',
-                ],
-        ] );
+        register_setting( self::SETTINGS_FIELD_GENERAL, self::OPTION_NAME, [ 'sanitize_callback' => [ $this, 'sanitize', ], ] );
+        register_setting( self::SETTINGS_FIELD_ADVANCED, self::OPTION_NAME, [ 'sanitize_callback' => [ $this, 'sanitize', ], ] );
 
-        // Add sections and fields for active tab
+        // Add sections and fields for the active tab
         if ( isset( $settings_config[ $this->active_tab ] ) ) {
             $config = $settings_config[ $this->active_tab ];
 
-            add_settings_section(
-                    $config['section_id'],
-                    $config['section_title'],
-                    null,
-                    $this->active_tab
-            );
+            // Create callback for section intro if it exists
+            $section_callback = null;
+            if ( isset( $config['intro'] ) && ! empty( $config['intro'] ) ) {
+                $section_callback = function () use ( $config ) {
+                    echo '<p>' . wp_kses_post( $config['intro'] ) . '</p>';
+                };
+            }
+
+            add_settings_section( $config['section_id'], $config['section_title'], $section_callback, $this->active_tab );
 
             foreach ( $config['settings'] as $setting_id => $setting ) {
+                // Check if this is an interlude field (no label)
+                $label = isset( $setting['label'] ) ? $setting['label'] : '';
+
                 add_settings_field(
                         $setting_id,
-                        $setting['label'],
+                        $label,
                         $setting['callback'],
                         $this->active_tab,
                         $config['section_id'],
@@ -169,14 +174,29 @@ class Settings {
         // Enqueue admin styles
         wp_enqueue_style( 'cc-admin', plugin_dir_url( CC_PLUGIN_FILE ) . 'assets/css/cc-admin.css', [], filemtime( plugin_dir_path( CC_PLUGIN_FILE ) . 'assets/css/cc-admin.css' ) );
 
+        // Enqueue admin scripts (always loaded)
+        wp_enqueue_script( 'cc-admin', plugin_dir_url( CC_PLUGIN_FILE ) . 'assets/js/cc-admin.js', [], filemtime( plugin_dir_path( CC_PLUGIN_FILE ) . 'assets/js/cc-admin.js' ), true );
+
+        // Create nonce once for both admin and wizard scripts
+        $wizard_nonce = wp_create_nonce( 'cc_wizard_nonce' );
+
+        wp_localize_script( 'cc-admin', 'ccAdmin', [
+                'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+                'nonce'   => $wizard_nonce,
+        ] );
+
         // If setup is not completed, enqueue wizard assets
-        if ( ! Helper::is_setup_completed() ) {
+        if ( Helper::should_display_wizard() ) {
             wp_enqueue_style( 'cc-wizard', plugin_dir_url( CC_PLUGIN_FILE ) . 'assets/css/cc-wizard.css', [], filemtime( plugin_dir_path( CC_PLUGIN_FILE ) . 'assets/css/cc-wizard.css' ) );
             wp_enqueue_script( 'cc-wizard', plugin_dir_url( CC_PLUGIN_FILE ) . 'assets/js/cc-wizard.js', [], filemtime( plugin_dir_path( CC_PLUGIN_FILE ) . 'assets/js/cc-wizard.js' ), true );
 
             wp_localize_script( 'cc-wizard', 'ccWizard', [
-                    'ajaxUrl' => admin_url( 'admin-ajax.php' ),
-                    'nonce'   => wp_create_nonce( 'cc_wizard_nonce' ),
+                    'ajaxUrl'          => admin_url( 'admin-ajax.php' ),
+                    'nonce'            => $wizard_nonce,
+                    'removingText'     => __( 'Removing...', 'correct-contact' ),
+                    'completingText'   => __( 'Completing...', 'correct-contact' ),
+                    'redirectingText'  => __( 'Redirecting...', 'correct-contact' ),
+                    'tokenRemovedText' => __( 'Token removed', 'correct-contact' ),
             ] );
 
             return;
@@ -237,6 +257,13 @@ class Settings {
     }
 
     /**
+     * Render interlude field (description only, no label or input).
+     */
+    public function render_interlude_field( $args ) {
+        echo wp_kses_post( $args['desc'] );
+    }
+
+    /**
      * Sanitize all settings.
      */
     public function sanitize( $input ) {
@@ -288,14 +315,14 @@ class Settings {
      * Render settings page.
      */
     public function render_settings_page() {
-        // Show wizard if setup is not completed
-        if ( ! Helper::is_setup_completed() ) {
+        // Show the wizard if setup is not completed
+        if ( Helper::should_display_wizard() ) {
             Helper::render_admin_view( 'view-wizard' );
 
             return;
         }
 
-        // Show normal settings page
+        // Show Settings page
         ?>
         <div class="wrap cc-admin">
             <h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
@@ -352,15 +379,24 @@ class Settings {
      * General Settings content.
      */
     public function general_settings_content() {
-        if ( $this->active_tab !== self::SETTINGS_FIELD_GENERAL ) {
+        $this->render_settings_content( self::SETTINGS_FIELD_GENERAL );
+    }
+
+    /**
+     * Render settings content for a specific tab.
+     *
+     * @param string $tab_id The tab ID to render.
+     */
+    private function render_settings_content( $tab_id ) {
+        if ( $this->active_tab !== $tab_id ) {
             return;
         }
         ?>
         <form action="options.php" method="post">
             <div class="cc-settings-container">
                 <?php
-                settings_fields( self::SETTINGS_FIELD_GENERAL );
-                do_settings_sections( self::SETTINGS_FIELD_GENERAL );
+                settings_fields( $tab_id );
+                do_settings_sections( $tab_id );
                 ?>
             </div>
             <?php submit_button(); ?>
@@ -372,19 +408,6 @@ class Settings {
      * Advanced Settings content.
      */
     public function advanced_settings_content() {
-        if ( $this->active_tab !== self::SETTINGS_FIELD_ADVANCED ) {
-            return;
-        }
-        ?>
-        <form action="options.php" method="post">
-            <div class="cc-settings-container">
-                <?php
-                settings_fields( self::SETTINGS_FIELD_ADVANCED );
-                do_settings_sections( self::SETTINGS_FIELD_ADVANCED );
-                ?>
-            </div>
-            <?php submit_button(); ?>
-        </form>
-        <?php
+        $this->render_settings_content( self::SETTINGS_FIELD_ADVANCED );
     }
 }
