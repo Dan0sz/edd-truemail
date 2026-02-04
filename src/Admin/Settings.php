@@ -106,7 +106,7 @@ class Settings {
                                 self::ACCESS_TOKEN  => [
                                         'label'             => __( 'Access Token', 'correct-contact' ),
                                         'callback'          => [ $this, 'render_text_field' ],
-                                        'desc'              => __( 'Enter the Access Token (environment variable) you\'ve configured in your Truemail instance here.', 'correct-contact' ),
+                                        'desc'              => __( 'Enter the access token used to authenticate with the Truemail service.', 'correct-contact' ),
                                         'sanitize_callback' => null,
                                 ],
                                 self::APP_URL       => [
