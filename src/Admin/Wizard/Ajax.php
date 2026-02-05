@@ -28,6 +28,7 @@ class Ajax {
 		add_action( 'wp_ajax_cc_wizard_complete', [ $this, 'ajax_wizard_complete' ] );
 		add_action( 'wp_ajax_cc_wizard_skip', [ $this, 'ajax_wizard_skip' ] );
 		add_action( 'wp_ajax_cc_wizard_restart', [ $this, 'ajax_wizard_restart' ] );
+		add_action( 'wp_ajax_cc_wizard_run_again', [ $this, 'ajax_wizard_run_again' ] );
 	}
 	
 	/**
@@ -440,6 +441,23 @@ class Ajax {
 		}
 		
 		// Remove both setup options to restart the wizard
+		delete_option( Settings::SETUP_COMPLETED );
+		delete_option( Settings::SETUP_SKIPPED );
+		
+		wp_send_json_success();
+	}
+	
+	/**
+	 * AJAX handler for running the wizard again from Advanced Settings.
+	 */
+	public function ajax_wizard_run_again() {
+		check_ajax_referer( 'cc_wizard_nonce', 'nonce' );
+		
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( [ 'message' => __( 'Insufficient permissions.', 'correct-contact' ) ] );
+		}
+		
+		// Remove setup completed option to show the wizard again
 		delete_option( Settings::SETUP_COMPLETED );
 		delete_option( Settings::SETUP_SKIPPED );
 		

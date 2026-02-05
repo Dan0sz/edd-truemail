@@ -72,6 +72,26 @@
 .cc-admin #submit:hover {
     background-color: #0099cc;
 }
+ 
+.cc-admin .button-secondary {
+    background: none;
+    border: none;
+    color: #00adda;
+    box-shadow: none;
+    padding: 7px 20px;
+}
+
+.cc-admin .button-secondary:hover {
+    background: none;
+    border: none;
+    color: #0099cc;
+}
+
+.cc-admin .button:focus,
+.cc-wizard-confirm-dialog .button:focus {
+    border: none;
+    box-shadow: none;
+}
 
 /**
  * Navigation
@@ -198,10 +218,121 @@
 }
 
 /**
+ * Confirmation Dialog
+ */
+.cc-dialog-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 100000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cc-dialog {
+    background-color: #fff;
+    border-top: 4px solid #00adda;
+    border-radius: 10px;
+    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.3);
+    max-width: 500px;
+    width: 90%;
+    font-family: 'Public Sans', Arial, sans-serif;
+}
+
+.cc-dialog-header {
+    padding: 20px 25px 10px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.cc-dialog-header h2 {
+    margin: 0;
+    font-family: 'Poppins', Verdana, sans-serif;
+    font-weight: 600;
+    font-size: 20px;
+    color: #1d2327;
+}
+
+.cc-dialog-content {
+    padding: 20px 25px;
+}
+
+.cc-dialog-content p {
+    margin: 0 0 15px 0;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #1d2327;
+}
+
+.cc-dialog-content p:last-child {
+    margin-bottom: 0;
+}
+
+.cc-dialog-content p strong {
+    font-weight: 600;
+    color: #1d2327;
+}
+
+.cc-dialog-actions {
+    padding: 15px 25px 20px;
+    display: flex;
+    gap: 10px;
+    justify-content: flex-start;
+}
+
+.cc-dialog-actions .button {
+    font-family: 'Poppins', Verdana, sans-serif;
+    border-radius: 10px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.cc-dialog-actions .button-primary {
+    background: #00adda;
+    border: 0;
+    color: #fff;
+    padding: 7px 20px;
+}
+
+.cc-dialog-actions .button-primary:hover {
+    background-color: #0099cc;
+}
+
+.cc-dialog-actions .button-secondary {
+    background: none;
+    border: none;
+    color: #00adda;
+    box-shadow: none;
+    padding: 7px 20px;
+}
+
+.cc-dialog-actions .button-secondary:hover {
+    background: none;
+    border: none;
+    color: #0099cc;
+}
+
+/**
  * Responsive
  */
 @media only screen and (max-width: 782px) {
     .cc-settings-container {
         margin: 20px 0;
+    }
+
+    .cc-dialog {
+        width: 95%;
+        max-width: none;
+    }
+
+    .cc-dialog-actions {
+        flex-direction: column;
+    }
+
+    .cc-dialog-actions .button {
+        width: 100%;
     }
 }

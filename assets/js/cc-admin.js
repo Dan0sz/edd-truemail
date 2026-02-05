@@ -19,7 +19,62 @@
                 if (e.target.classList.contains('cc-wizard-restart')) {
                     this.restartWizard(e);
                 }
+
+                if (e.target.classList.contains('cc-run-wizard-again')) {
+                    this.showConfirmDialog(e);
+                }
+
+                if (e.target.classList.contains('cc-dialog-cancel')) {
+                    this.hideConfirmDialog(e);
+                }
+
+                if (e.target.classList.contains('cc-dialog-confirm')) {
+                    this.confirmRunWizard(e);
+                }
+
+                // Close dialog when clicking overlay
+                if (e.target.classList.contains('cc-dialog-overlay')) {
+                    this.hideConfirmDialog(e);
+                }
             });
+        },
+
+        showConfirmDialog: function (e) {
+            e.preventDefault();
+            const dialog = document.getElementById('cc-wizard-confirm-dialog');
+            if (dialog) {
+                dialog.style.display = 'flex';
+            }
+        },
+
+        hideConfirmDialog: function (e) {
+            e.preventDefault();
+            const dialog = document.getElementById('cc-wizard-confirm-dialog');
+            if (dialog) {
+                dialog.style.display = 'none';
+            }
+        },
+
+        confirmRunWizard: function (e) {
+            e.preventDefault();
+
+            const formData = new FormData();
+            formData.append('action', 'cc_wizard_run_again');
+            formData.append('nonce', ccAdmin.nonce);
+
+            fetch(ccAdmin.ajaxUrl, {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(response => {
+                    if (response.success) {
+                        window.location.reload();
+                    }
+                })
+                .catch(() => {
+                    // Silently fail - user can try again
+                });
         },
 
         restartWizard: function (e) {

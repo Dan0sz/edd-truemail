@@ -348,6 +348,28 @@ class Settings {
                 <?php do_action( 'cc_settings_content' ); ?>
             </div>
         </div>
+
+        <!-- Confirmation Dialog -->
+        <div id="cc-wizard-confirm-dialog" class="cc-dialog-overlay" style="display: none;">
+            <div class="cc-dialog">
+                <div class="cc-dialog-header">
+                    <h2><?php esc_html_e( 'Run setup wizard again?', 'correct-contact' ); ?></h2>
+                </div>
+                <div class="cc-dialog-content">
+                    <p><?php esc_html_e( 'This will guide you through setting up the email validation service again.', 'correct-contact' ); ?></p>
+                    <p><?php esc_html_e( 'If you complete the wizard, your current configuration will be replaced.', 'correct-contact' ); ?></p>
+                    <p><strong><?php esc_html_e( 'Your existing infrastructure will not be modified or deleted automatically.', 'correct-contact' ); ?></strong></p>
+                </div>
+                <div class="cc-dialog-actions">
+                    <button type="button" class="button button-primary cc-dialog-confirm">
+                        <?php esc_html_e( 'Run setup wizard', 'correct-contact' ); ?>
+                    </button>
+                    <button type="button" class="button button-secondary cc-dialog-cancel">
+                        <?php esc_html_e( 'Cancel', 'correct-contact' ); ?>
+                    </button>
+                </div>
+            </div>
+        </div>
         <?php
     }
 
@@ -414,7 +436,18 @@ class Settings {
                 do_settings_sections( $tab_id );
                 ?>
             </div>
-            <?php submit_button(); ?>
+            <?php
+            submit_button( '', 'primary', 'submit', false );
+
+            // Add "Run setup wizard again" button only on Advanced Settings tab
+            if ( $tab_id === self::SETTINGS_FIELD_ADVANCED ) {
+                ?>
+                <button type="button" class="button button-secondary cc-run-wizard-again" style="margin-left: 10px;">
+                    <?php esc_html_e( 'Run setup wizard again', 'correct-contact' ); ?>
+                </button>
+                <?php
+            }
+            ?>
         </form>
         <?php
     }
