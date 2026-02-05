@@ -106,20 +106,24 @@ class Settings {
                                 self::ACCESS_TOKEN  => [
                                         'label'             => __( 'Access Token', 'correct-contact' ),
                                         'callback'          => [ $this, 'render_text_field' ],
-                                        'desc'              => __( 'Enter the access token used to authenticate with the Truemail service.', 'correct-contact' ),
+                                        'desc'              => Helper::is_setup_completed() ? __( 'Your Access Token is generated and managed automatically.', 'correct-contact' ) : __( 'Enter the access token used to authenticate with the Truemail service.',
+                                                'correct-contact' ),
                                         'sanitize_callback' => null,
+                                        'disabled'          => Helper::is_setup_completed() && Options::get( self::ACCESS_TOKEN ),
                                 ],
                                 self::APP_URL       => [
                                         'label'             => __( 'Application URL', 'correct-contact' ),
                                         'callback'          => [ $this, 'render_text_field' ],
-                                        'desc'              => __( 'Enter the URL of your Truemail instance here.', 'correct-contact' ),
+                                        'desc'              => Helper::is_setup_completed() ? __( 'Your Truemail Application URL is managed automatically.', 'correct-contact' ) : __( 'Enter the URL of your Truemail instance here.', 'correct-contact' ),
                                         'sanitize_callback' => null,
+                                        'disabled'          => Helper::is_setup_completed() && Options::get( self::APP_URL ),
                                 ],
                                 'app_url_interlude' => [
                                         'callback' => [ $this, 'render_interlude_field' ],
                                         'desc'     => '<p><strong>' . __( 'Don\'t have a Truemail server yet?', 'correct-contact' ) . '</strong></p><ul><li><a href="#" class="cc-wizard-restart">' .
                                                       __( 'Follow the wizard', 'correct-contact' ) . '</a> ' . __( 'to create one automatically, or', 'correct-contact' ) . '</li><li><a href="#" 
         target="_blank">' . __( 'Set one up yourself', 'correct-contact' ) . '</a>.</li></ul>',
+                                        'hidden'   => Options::get( self::ACCESS_TOKEN ) && Options::get( self::APP_URL ),
                                 ],
                         ],
                 ],
@@ -144,6 +148,10 @@ class Settings {
             add_settings_section( $config['section_id'], $config['section_title'], $section_callback, $this->active_tab );
 
             foreach ( $config['settings'] as $setting_id => $setting ) {
+                if ( isset( $setting['hidden'] ) && $setting['hidden'] ) {
+                    return;
+                }
+
                 // Check if this is an interlude field (no label)
                 $label = isset( $setting['label'] ) ? $setting['label'] : '';
 
@@ -154,9 +162,10 @@ class Settings {
                         $this->active_tab,
                         $config['section_id'],
                         [
-                                'id'   => $setting_id,
-                                'desc' => $setting['desc'],
-                                'name' => self::OPTION_NAME . "[$setting_id]",
+                                'id'       => $setting_id,
+                                'desc'     => $setting['desc'],
+                                'name'     => self::OPTION_NAME . "[$setting_id]",
+                                'disabled' => isset( $setting['disabled'] ) && $setting['disabled'],
                         ]
                 );
             }
@@ -193,6 +202,7 @@ class Settings {
             wp_localize_script( 'cc-wizard', 'ccWizard', [
                     'ajaxUrl'          => admin_url( 'admin-ajax.php' ),
                     'nonce'            => $wizard_nonce,
+                    'creatingText'     => __( 'Creating', 'correct-contact' ),
                     'removingText'     => __( 'Removing...', 'correct-contact' ),
                     'completingText'   => __( 'Completing...', 'correct-contact' ),
                     'redirectingText'  => __( 'Redirecting...', 'correct-contact' ),
@@ -223,8 +233,9 @@ class Settings {
      * Render text field.
      */
     public function render_text_field( $args ) {
-        $value = Options::get( $args['id'] );
-        echo '<input type="text" id="' . esc_attr( $args['id'] ) . '" name="' . esc_attr( $args['name'] ) . '" value="' . esc_attr( $value ) . '" class="regular-text">';
+        $value    = Options::get( $args['id'] );
+        $disabled = isset( $args['disabled'] ) && $args['disabled'] ? ' disabled ' : '';
+        echo '<input type="text" id="' . esc_attr( $args['id'] ) . '"' . $disabled . 'name="' . esc_attr( $args['name'] ) . '" value="' . esc_attr( $value ) . '" class="regular-text">';
         echo '<p class="description">' . esc_html( $args['desc'] ) . '</p>';
     }
 
@@ -260,6 +271,10 @@ class Settings {
      * Render interlude field (description only, no label or input).
      */
     public function render_interlude_field( $args ) {
+        if ( isset( $args['hidden'] ) && $args['hidden'] ) {
+            return;
+        }
+
         echo wp_kses_post( $args['desc'] );
     }
 

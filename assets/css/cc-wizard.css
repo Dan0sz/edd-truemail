@@ -336,9 +336,8 @@
 
 .cc-wizard-progress-steps li {
     display: none;
-    font-size: 16px;
     color: #1d2327;
-    font-weight: 500;
+    font-weight: 700;
 }
 
 .cc-wizard-progress-steps li.active {

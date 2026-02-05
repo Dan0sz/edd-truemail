@@ -269,6 +269,21 @@
             // Disable button and keep it visible
             button.disabled = true;
 
+            // Add animated loading text
+            const originalText = button.textContent;
+            let dotCount = 0;
+            const animateText = () => {
+                dotCount = (dotCount + 1) % 4;
+                button.textContent = ccWizard.creatingText + '.'.repeat(dotCount);
+            };
+
+            // Start animation immediately
+            animateText();
+            const textInterval = setInterval(animateText, 500);
+
+            // Store interval ID so we can clear it later
+            this.loadingInterval = textInterval;
+
             // Fade content, show progress
             if (content) {
                 content.style.transition = 'opacity 0.2s';
@@ -363,6 +378,12 @@
                                     progressFill.classList.add('success');
                                 }
 
+                                // Clear loading text animation
+                                if (self.loadingInterval) {
+                                    clearInterval(self.loadingInterval);
+                                    self.loadingInterval = null;
+                                }
+
                                 // Re-enable button and change label to "Continue"
                                 const button = document.querySelector('.cc-wizard-provision');
                                 if (button) {
@@ -394,6 +415,12 @@
             const errorActions = slide.querySelector('.cc-wizard-provision-error-actions');
             const progressFill = slide.querySelector('.cc-wizard-progress-fill');
             const stepsList = slide.querySelector('.cc-wizard-progress-steps');
+
+            // Clear loading text animation
+            if (this.loadingInterval) {
+                clearInterval(this.loadingInterval);
+                this.loadingInterval = null;
+            }
 
             // Mark current step as error
             const stepElements = document.querySelectorAll('.cc-wizard-progress-steps li');
