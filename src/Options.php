@@ -25,14 +25,15 @@ class Options {
 	 * @return mixed
 	 */
 	public static function get( $key ) {
-		$defaults = [
-			Settings::DO_TOKEN        => '',
-			Settings::FIELD_SELECTORS => 'input[type="email"]',
-			Settings::BLOCK_PURCHASE  => '',
-			Settings::ACCESS_TOKEN    => '',
-			Settings::APP_URL         => '',
-			Settings::REGION          => '',
-		];
+		$defaults = apply_filters( 'cc_options_get_defaults', [
+			Settings::DO_TOKEN               => '',
+			Settings::FIELD_SELECTORS        => 'input[type="email"]',
+			Settings::ONE_CLICK_INTEGRATIONS => [],
+			Settings::BLOCK_SUBMIT           => '',
+			Settings::ACCESS_TOKEN           => '',
+			Settings::APP_URL                => '',
+			Settings::REGION                 => '',
+		] );
 		$options  = get_option( self::OPTION_NAME, [] );
 		
 		if ( ! is_array( $options ) && isset( $defaults[ $key ] ) ) {

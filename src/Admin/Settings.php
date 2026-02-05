@@ -22,9 +22,11 @@ class Settings {
 
     const APP_URL = 'app_url';
 
-    const BLOCK_PURCHASE = 'block_checkout';
-
     const FIELD_SELECTORS = 'field_selectors';
+
+    const ONE_CLICK_INTEGRATIONS = 'pro_integrations';
+
+    const BLOCK_SUBMIT = 'pro_block_submit';
 
     const DO_TOKEN = 'do_token';
 
@@ -84,17 +86,24 @@ class Settings {
                         'section_id'    => 'cc_general_section',
                         'section_title' => __( 'General Settings', 'correct-contact' ),
                         'settings'      => [
-                                self::FIELD_SELECTORS => [
+                                self::FIELD_SELECTORS        => [
                                         'label'             => __( 'Fields to Validate', 'correct-contact' ),
                                         'callback'          => [ $this, 'render_selectors_field' ],
                                         'desc'              => __( 'Add the CSS selectors (classes or IDs) of the email fields you want to validate. Press enter after each entry.', 'correct-contact' ),
                                         'sanitize_callback' => [ $this, 'sanitize_selectors' ],
                                 ],
-                                self::BLOCK_PURCHASE  => [
-                                        'label'             => __( 'Prevent Purchase on Failure', 'correct-contact' ),
-                                        'callback'          => [ $this, 'render_checkbox_field' ],
-                                        'desc'              => __( 'If enabled, the user won\'t be able to finalize the purchase in WooCommerce and Easy Digital Downloads if the email address fails to validate. Fails silently on a request timeout.', 'correct-contact' ),
+                                self::ONE_CLICK_INTEGRATIONS => [
+                                        'label'             => __( 'One-click integrations (Pro)', 'correct-contact' ),
+                                        'callback'          => [ $this, 'render_integrations_field' ],
+                                        'desc'              => __( 'Automatically enable email validation for supported plugins. No manual configuration required — just enable and go. Available in CorrectContact Pro.', 'correct-contact' ),
                                         'sanitize_callback' => null,
+                                ],
+                                self::BLOCK_SUBMIT           => [
+                                        'label'             => __( 'Prevent Submit on Failure (Pro)', 'correct-contact' ),
+                                        'callback'          => [ $this, 'render_checkbox_field' ],
+                                        'desc'              => __( 'If enabled, users won’t be able to submit a form or complete a purchase when using one-click integrations if the email address fails validation. Timeouts fail silently. Available in CorrectContact Pro.', 'correct-contact' ),
+                                        'sanitize_callback' => null,
+                                        'disabled'          => ! defined( 'CORRECT_CONTACT_PRO' ),
                                 ],
                         ],
                 ],
@@ -235,6 +244,7 @@ class Settings {
     public function render_text_field( $args ) {
         $value    = Options::get( $args['id'] );
         $disabled = isset( $args['disabled'] ) && $args['disabled'] ? ' disabled ' : '';
+
         echo '<input type="text" id="' . esc_attr( $args['id'] ) . '"' . $disabled . 'name="' . esc_attr( $args['name'] ) . '" value="' . esc_attr( $value ) . '" class="regular-text">';
         echo '<p class="description">' . esc_html( $args['desc'] ) . '</p>';
     }
@@ -243,9 +253,11 @@ class Settings {
      * Render checkbox field.
      */
     public function render_checkbox_field( $args ) {
-        $value = Options::get( $args['id'] );
+        $value    = Options::get( $args['id'] );
+        $disabled = isset( $args['disabled'] ) && $args['disabled'] ? ' disabled ' : '';
+
         echo '<label for="' . esc_attr( $args['id'] ) . '">';
-        echo '<input type="checkbox" id="' . esc_attr( $args['id'] ) . '" name="' . esc_attr( $args['name'] ) . '" value="1" ' . checked( 1, $value, false ) . '>';
+        echo '<input type="checkbox" id="' . esc_attr( $args['id'] ) . '"' . $disabled . 'name="' . esc_attr( $args['name'] ) . '" value="1" ' . checked( 1, $value, false ) . '>';
         echo esc_html( $args['desc'] );
         echo '</label>';
     }
@@ -279,6 +291,53 @@ class Settings {
     }
 
     /**
+     * Render one-click integrations field with checkboxes.
+     */
+    public function render_integrations_field( $args ) {
+        $integrations = [
+                __( 'Ecommerce', 'correct-contact' ) => [
+                        'woocommerce'            => 'WooCommerce',
+                        'easy-digital-downloads' => 'Easy Digital Downloads',
+                        'surecart'               => 'SureCart',
+                ],
+                __( 'Forms', 'correct-contact' )     => [
+                        'contact-form-7'   => 'Contact Form 7',
+                        'formidable-forms' => 'Formidable Forms',
+                        'gravity-forms'    => 'Gravity Forms',
+                        'ninja-forms'      => 'Ninja Forms',
+                        'wpforms'          => 'WPForms',
+                ],
+        ];
+        $disabled     = defined( 'CORRECT_CONTACT_PRO' ) ? '' : 'disabled';
+        $saved_values = Options::get( self::ONE_CLICK_INTEGRATIONS );
+        $saved_values = is_array( $saved_values ) ? $saved_values : [];
+
+        echo '<div class="cc-checkbox-list">';
+
+        foreach ( $integrations as $category => $plugins ) {
+            echo '<div class="cc-checkbox-list-sub-heading">';
+            echo '<strong>' . esc_html( $category ) . '</strong>';
+            echo '<ul style="margin: 5px 0 15px 0;">';
+
+            foreach ( $plugins as $plugin_key => $plugin_label ) {
+                $checked = in_array( $plugin_key, $saved_values, true ) ? 'checked' : '';
+                echo '<li style="margin: 3px 0;">';
+                echo '<label>';
+                echo '<input type="checkbox" name="' . esc_attr( $args['name'] ) . '[]" value="' . esc_attr( $plugin_key ) . '" ' . $disabled . ' ' . $checked . '> ';
+                echo esc_html( $plugin_label );
+                echo '</label>';
+                echo '</li>';
+            }
+
+            echo '</ul>';
+            echo '</div>';
+        }
+
+        echo '</div>';
+        echo '<p class="description">' . esc_html( $args['desc'] ) . '</p>';
+    }
+
+    /**
      * Sanitize all settings.
      */
     public function sanitize( $input ) {
@@ -308,8 +367,15 @@ class Settings {
             $output[ self::REGION ] = sanitize_text_field( $input[ self::REGION ] );
         }
 
-        if ( isset( $input[ self::BLOCK_PURCHASE ] ) ) {
-            $output[ self::BLOCK_PURCHASE ] = (int) $input[ self::BLOCK_PURCHASE ];
+        if ( isset( $input[ self::BLOCK_SUBMIT ] ) ) {
+            $output[ self::BLOCK_SUBMIT ] = (int) $input[ self::BLOCK_SUBMIT ];
+        }
+
+        if ( isset( $input[ self::ONE_CLICK_INTEGRATIONS ] ) && is_array( $input[ self::ONE_CLICK_INTEGRATIONS ] ) ) {
+            $output[ self::ONE_CLICK_INTEGRATIONS ] = array_map( 'sanitize_text_field', $input[ self::ONE_CLICK_INTEGRATIONS ] );
+        } else {
+            // If not set, it means all checkboxes were unchecked, so save empty array
+            $output[ self::ONE_CLICK_INTEGRATIONS ] = [];
         }
 
         return $output;

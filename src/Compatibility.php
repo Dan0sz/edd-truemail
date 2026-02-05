@@ -29,7 +29,7 @@ abstract class Compatibility {
 	 * @throws InvalidArgument
 	 */
 	public function validate_email( $valid_data, $data ) {
-		if ( empty( Options::get( Settings::BLOCK_PURCHASE ) ) ) {
+		if ( empty( Options::get( Settings::BLOCK_SUBMIT ) ) ) {
 			return;
 		}
 		

@@ -35,6 +35,10 @@
     list-style: initial;
 }
 
+.cc-admin .cc-checkbox-list ul {
+    list-style: none;
+}
+
 .cc-admin li > ul,
 .cc-admin li > ol {
     margin: .25rem 1rem;
@@ -72,7 +76,7 @@
 .cc-admin #submit:hover {
     background-color: #0099cc;
 }
- 
+
 .cc-admin .button-secondary {
     background: none;
     border: none;
@@ -143,7 +147,7 @@
 }
 
 .cc-settings-container .form-table tr td {
-    padding: 15px 0;
+    padding: 20px 0;
 }
 
 .cc-settings-container p,
