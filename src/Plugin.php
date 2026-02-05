@@ -54,7 +54,7 @@ class Plugin {
 		], filemtime( plugin_dir_path( CC_PLUGIN_FILE ) . 'assets/js/correct-contact.js' ), false );
 		wp_enqueue_style( 'correct-contact', plugin_dir_url( CC_PLUGIN_FILE ) . "assets/css/correct-contact$ext.css", [], filemtime( plugin_dir_path( CC_PLUGIN_FILE ) . 'assets/css/correct-contact.css' ) );
 		
-		$selectors = Options::get( Settings::FIELD_SELECTORS, '' );
+		$selectors = apply_filters( 'correct_contact_field_selectors', Options::get( Settings::FIELD_SELECTORS, '' ) );
 		
 		wp_localize_script( 'correct-contact', 'cc_ajax_obj', [
 			'ajax_url'  => admin_url( 'admin-ajax.php' ),
