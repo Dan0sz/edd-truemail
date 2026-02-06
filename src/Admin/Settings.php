@@ -36,6 +36,10 @@ class Settings {
 
     const SETTINGS_FIELD_ADVANCED = 'cc-advanced-settings';
 
+    const SETTINGS_FIELD_BULK_VALIDATION = 'cc-bulk-validation-settings';
+
+    const SCAN_SOURCES = 'scan_sources';
+
     const SETUP_COMPLETED = 'cc_setup_completed';
 
     const SETUP_SKIPPED = 'cc_setup_skipped';
@@ -58,10 +62,12 @@ class Settings {
         // Tabs
         add_action( 'cc_settings_tab', [ $this, 'general_settings_tab' ], 1 );
         add_action( 'cc_settings_tab', [ $this, 'advanced_settings_tab' ], 2 );
+        add_action( 'cc_settings_tab', [ $this, 'bulk_validate_tab' ], 3 );
 
         // Content
         add_action( 'cc_settings_content', [ $this, 'general_settings_content' ], 1 );
         add_action( 'cc_settings_content', [ $this, 'advanced_settings_content' ], 2 );
+        add_action( 'cc_settings_content', [ $this, 'bulk_validate_content' ], 3 );
     }
 
     /**
@@ -82,7 +88,7 @@ class Settings {
      */
     public function register_settings() {
         $settings_config = [
-                self::SETTINGS_FIELD_GENERAL  => [
+                self::SETTINGS_FIELD_GENERAL         => [
                         'section_id'    => 'cc_general_section',
                         'section_title' => __( 'General Settings', 'correct-contact' ),
                         'settings'      => [
@@ -107,7 +113,7 @@ class Settings {
                                 ],
                         ],
                 ],
-                self::SETTINGS_FIELD_ADVANCED => [
+                self::SETTINGS_FIELD_ADVANCED        => [
                         'section_id'    => 'cc_advanced_section',
                         'section_title' => __( 'Advanced Settings', 'correct-contact' ),
                         'intro'         => '<p>' . __( 'CorrectContact validates email addresses using a Truemail service.', 'correct-contact' ) . '</p><p>' . __( 'For most users, this service is created automatically during setup.', 'correct-contact' ) . ' ' . __( 'Advanced users can configure a custom Truemail server here.', 'correct-contact' ) . '</p>',
@@ -136,11 +142,25 @@ class Settings {
                                 ],
                         ],
                 ],
+                self::SETTINGS_FIELD_BULK_VALIDATION => [
+                        'section_id'    => 'cc_bulk_validation_section',
+                        'section_title' => __( 'Bulk Email Validation (Pro)', 'correct-contact' ),
+                        'intro'         => '<p>' . __( 'Scan email addresses used by WordPress and enabled one-click integrations and validate them in bulk. No data is removed automatically. You\'re in control.', 'correct-contact' ) . '</p>',
+                        'settings'      => [
+                                self::SCAN_SOURCES => [
+                                        'label'             => __( 'Scan sources', 'correct-contact' ),
+                                        'callback'          => [ $this, 'render_scan_sources_field' ],
+                                        'desc'              => __( 'Select which integrations you want to scan.', 'correct-contact' ),
+                                        'sanitize_callback' => null,
+                                ],
+                        ],
+                ],
         ];
 
         // Register all settings
         register_setting( self::SETTINGS_FIELD_GENERAL, self::OPTION_NAME, [ 'sanitize_callback' => [ $this, 'sanitize', ], ] );
         register_setting( self::SETTINGS_FIELD_ADVANCED, self::OPTION_NAME, [ 'sanitize_callback' => [ $this, 'sanitize', ], ] );
+        register_setting( self::SETTINGS_FIELD_BULK_VALIDATION, self::OPTION_NAME, [ 'sanitize_callback' => [ $this, 'sanitize', ], ] );
 
         // Add sections and fields for the active tab
         if ( isset( $settings_config[ $this->active_tab ] ) ) {
@@ -236,6 +256,43 @@ class Settings {
                 }
 			});
 		" );
+
+        // Add "Select all" functionality for scan sources
+        wp_add_inline_script( 'cc-admin', "
+			document.addEventListener('DOMContentLoaded', function() {
+                var selectAllCheckbox = document.getElementById('cc-scan-sources-select-all');
+                if (selectAllCheckbox) {
+                    var sourceCheckboxes = document.querySelectorAll('.cc-scan-source-checkbox:not([disabled])');
+                    
+                    // Update select all state on page load
+                    function updateSelectAllState() {
+                        var allChecked = true;
+                        sourceCheckboxes.forEach(function(checkbox) {
+                            if (!checkbox.checked) {
+                                allChecked = false;
+                            }
+                        });
+                        selectAllCheckbox.checked = allChecked && sourceCheckboxes.length > 0;
+                    }
+                    
+                    updateSelectAllState();
+                    
+                    // Handle select all checkbox click
+                    selectAllCheckbox.addEventListener('change', function() {
+                        sourceCheckboxes.forEach(function(checkbox) {
+                            checkbox.checked = selectAllCheckbox.checked;
+                        });
+                    });
+                    
+                    // Handle individual checkbox clicks
+                    sourceCheckboxes.forEach(function(checkbox) {
+                        checkbox.addEventListener('change', function() {
+                            updateSelectAllState();
+                        });
+                    });
+                }
+			});
+		" );
     }
 
     /**
@@ -294,7 +351,79 @@ class Settings {
      * Render one-click integrations field with checkboxes.
      */
     public function render_integrations_field( $args ) {
-        $integrations = [
+        $saved_values = Options::get( self::ONE_CLICK_INTEGRATIONS );
+        $saved_values = is_array( $saved_values ) ? $saved_values : [];
+
+        $this->render_checkbox_list( $args, $saved_values );
+    }
+
+    /**
+     * Render integration checkboxes.
+     *
+     * @param array $args Field arguments.
+     * @param array $saved_values Currently saved values.
+     * @param string $checkbox_class CSS class for checkboxes.
+     * @param bool $show_select_all Whether to show "Select all" checkbox.
+     * @param string $select_all_id ID for "Select all" checkbox.
+     * @param array $enabled_list List of enabled integrations (for conditional disabling).
+     */
+    private function render_checkbox_list( $args, $saved_values, $checkbox_class = '', $show_select_all = false, $select_all_id = '', $enabled_list = [] ) {
+        $integrations = $this->get_integrations_list();
+
+        echo '<div class="cc-checkbox-list">';
+
+        // Add "Select all" checkbox if requested
+        if ( $show_select_all ) {
+            echo '<div style="margin-bottom: 15px;">';
+            echo '<label>';
+            echo '<input type="checkbox" id="' . esc_attr( $select_all_id ) . '"> ';
+            echo '<strong>' . esc_html__( 'Select all', 'correct-contact' ) . '</strong>';
+            echo '</label>';
+            echo '</div>';
+        }
+
+        foreach ( $integrations as $category => $plugins ) {
+            echo '<div class="cc-checkbox-list-sub-heading">';
+            echo '<strong>' . esc_html( $category ) . '</strong>';
+            echo '<ul style="margin: 5px 0 15px 0;">';
+
+            foreach ( $plugins as $plugin_key => $plugin_label ) {
+                // Determine disabled state
+                $disabled = '';
+                if ( ! empty( $enabled_list ) ) {
+                    // For scan sources: disable if not in enabled list
+                    $disabled = in_array( $plugin_key, $enabled_list, true ) ? '' : 'disabled';
+                } else {
+                    // For integrations: disable if Pro is not active
+                    $disabled = defined( 'CORRECT_CONTACT_PRO' ) ? '' : 'disabled';
+                }
+
+                $checked    = in_array( $plugin_key, $saved_values, true ) ? 'checked' : '';
+                $class_attr = ! empty( $checkbox_class ) ? ' class="' . esc_attr( $checkbox_class ) . '"' : '';
+
+                echo '<li style="margin: 3px 0;">';
+                echo '<label>';
+                echo '<input type="checkbox"' . $class_attr . ' name="' . esc_attr( $args['name'] ) . '[]" value="' . esc_attr( $plugin_key ) . '" ' . $disabled . ' ' . $checked . '> ';
+                echo esc_html( $plugin_label );
+                echo '</label>';
+                echo '</li>';
+            }
+
+            echo '</ul>';
+            echo '</div>';
+        }
+
+        echo '</div>';
+        echo '<p class="description">' . esc_html( $args['desc'] ) . '</p>';
+    }
+
+    /**
+     * Get integrations list.
+     *
+     * @return array
+     */
+    private function get_integrations_list() {
+        return [
                 __( 'Ecommerce', 'correct-contact' ) => [
                         'woocommerce'            => 'WooCommerce',
                         'easy-digital-downloads' => 'Easy Digital Downloads',
@@ -308,33 +437,28 @@ class Settings {
                         'wpforms'          => 'WPForms',
                 ],
         ];
-        $disabled     = defined( 'CORRECT_CONTACT_PRO' ) ? '' : 'disabled';
-        $saved_values = Options::get( self::ONE_CLICK_INTEGRATIONS );
+    }
+
+    /**
+     * Render scan sources field with checkboxes for enabled integrations.
+     */
+    public function render_scan_sources_field( $args ) {
+        // Get enabled integrations from General tab
+        $enabled_integrations = Options::get( self::ONE_CLICK_INTEGRATIONS );
+        $enabled_integrations = is_array( $enabled_integrations ) ? $enabled_integrations : [];
+
+        // Get saved scan sources
+        $saved_values = Options::get( self::SCAN_SOURCES );
         $saved_values = is_array( $saved_values ) ? $saved_values : [];
 
-        echo '<div class="cc-checkbox-list">';
-
-        foreach ( $integrations as $category => $plugins ) {
-            echo '<div class="cc-checkbox-list-sub-heading">';
-            echo '<strong>' . esc_html( $category ) . '</strong>';
-            echo '<ul style="margin: 5px 0 15px 0;">';
-
-            foreach ( $plugins as $plugin_key => $plugin_label ) {
-                $checked = in_array( $plugin_key, $saved_values, true ) ? 'checked' : '';
-                echo '<li style="margin: 3px 0;">';
-                echo '<label>';
-                echo '<input type="checkbox" name="' . esc_attr( $args['name'] ) . '[]" value="' . esc_attr( $plugin_key ) . '" ' . $disabled . ' ' . $checked . '> ';
-                echo esc_html( $plugin_label );
-                echo '</label>';
-                echo '</li>';
-            }
-
-            echo '</ul>';
-            echo '</div>';
-        }
-
-        echo '</div>';
-        echo '<p class="description">' . esc_html( $args['desc'] ) . '</p>';
+        $this->render_checkbox_list(
+                $args,
+                $saved_values,
+                'cc-scan-source-checkbox',
+                true,
+                'cc-scan-sources-select-all',
+                $enabled_integrations
+        );
     }
 
     /**
@@ -376,6 +500,13 @@ class Settings {
         } else {
             // If not set, it means all checkboxes were unchecked, so save empty array
             $output[ self::ONE_CLICK_INTEGRATIONS ] = [];
+        }
+
+        if ( isset( $input[ self::SCAN_SOURCES ] ) && is_array( $input[ self::SCAN_SOURCES ] ) ) {
+            $output[ self::SCAN_SOURCES ] = array_map( 'sanitize_text_field', $input[ self::SCAN_SOURCES ] );
+        } else {
+            // If not set, it means all checkboxes were unchecked, so save empty array
+            $output[ self::SCAN_SOURCES ] = [];
         }
 
         return $output;
@@ -523,5 +654,23 @@ class Settings {
      */
     public function advanced_settings_content() {
         $this->render_settings_content( self::SETTINGS_FIELD_ADVANCED );
+    }
+
+    /**
+     * Bulk Validate tab.
+     */
+    public function bulk_validate_tab() {
+        $this->generate_tab(
+                self::SETTINGS_FIELD_BULK_VALIDATION,
+                'dashicons-yes-alt',
+                __( 'Bulk Validation (Pro)', 'correct-contact' )
+        );
+    }
+
+    /**
+     * Bulk Validate content.
+     */
+    public function bulk_validate_content() {
+        $this->render_settings_content( self::SETTINGS_FIELD_BULK_VALIDATION );
     }
 }
