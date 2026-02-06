@@ -354,7 +354,7 @@ class Settings {
         $saved_values = Options::get( self::ONE_CLICK_INTEGRATIONS );
         $saved_values = is_array( $saved_values ) ? $saved_values : [];
 
-        $this->render_checkbox_list( $args, $saved_values );
+        $this->render_checkbox_list( $this->get_integrations_list(), $args, $saved_values );
     }
 
     /**
@@ -367,9 +367,7 @@ class Settings {
      * @param string $select_all_id ID for "Select all" checkbox.
      * @param array $enabled_list List of enabled integrations (for conditional disabling).
      */
-    private function render_checkbox_list( $args, $saved_values, $checkbox_class = '', $show_select_all = false, $select_all_id = '', $enabled_list = [] ) {
-        $integrations = $this->get_integrations_list();
-
+    private function render_checkbox_list( $list, $args, $saved_values, $checkbox_class = '', $show_select_all = false, $select_all_id = '', $enabled_list = [] ) {
         echo '<div class="cc-checkbox-list">';
 
         // Add "Select all" checkbox if requested
@@ -382,14 +380,12 @@ class Settings {
             echo '</div>';
         }
 
-        foreach ( $integrations as $category => $plugins ) {
+        foreach ( $list as $category => $plugins ) {
             echo '<div class="cc-checkbox-list-sub-heading">';
             echo '<strong>' . esc_html( $category ) . '</strong>';
             echo '<ul style="margin: 5px 0 15px 0;">';
 
             foreach ( $plugins as $plugin_key => $plugin_label ) {
-                // Determine disabled state
-                $disabled = '';
                 if ( ! empty( $enabled_list ) ) {
                     // For scan sources: disable if not in enabled list
                     $disabled = in_array( $plugin_key, $enabled_list, true ) ? '' : 'disabled';
@@ -452,6 +448,7 @@ class Settings {
         $saved_values = is_array( $saved_values ) ? $saved_values : [];
 
         $this->render_checkbox_list(
+                $this->get_integrations_list(),
                 $args,
                 $saved_values,
                 'cc-scan-source-checkbox',
